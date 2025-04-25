@@ -45,6 +45,7 @@ export function AgenticaRpcProvider({ children }: PropsWithChildren) {
             }
             try {
                 await driver.conversate(message);
+                console.log("Message sent front:", message);
             } catch (e) {
                 console.error(e);
                 setIsError(true);

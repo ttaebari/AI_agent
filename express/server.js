@@ -7,11 +7,10 @@ app.use(cors()); // CORS 설정
 app.use(express.json());
 
 const PORT = 3001;
-const helloWorld = () => {
-    console.log("main server.js");
-};
 
-app.get("/", helloWorld);
+app.get("/", (req, res) => {
+    res.sendFile("index.html", { root: "./public" });
+});
 
 //DB 업데이트 api
 app.post("/todos", async (req, res) => {

@@ -1,4 +1,8 @@
-import { Agentica, IAgenticaHistoryJson } from "@agentica/core";
+import {
+  Agentica,
+  AgenticaHistory,
+  IAgenticaHistoryJson,
+} from "@agentica/core";
 import {
   AgenticaRpcService,
   IAgenticaRpcListener,
@@ -20,6 +24,13 @@ const getPromptHistories = async (
   return [];
 };
 
+class CustomAgentica extends Agentica<"chatgpt"> {
+  conversate(content: string): Promise<AgenticaHistory<"chatgpt">[]> {
+    console.log("conversate", content);
+    return super.conversate(content);
+  }
+}
+
 const main = async (): Promise<void> => {
   if (SGlobal.env.OPENAI_API_KEY === undefined)
     console.error("env.OPENAI_API_KEY is not defined.");
@@ -31,7 +42,7 @@ const main = async (): Promise<void> => {
   > = new WebSocketServer();
   await server.open(Number(SGlobal.env.PORT), async (acceptor) => {
     const url: URL = new URL(`http://localhost${acceptor.path}`);
-    const agent: Agentica<"chatgpt"> = new Agentica({
+    const agent: Agentica<"chatgpt"> = new CustomAgentica({
       model: "chatgpt",
       vendor: {
         api: new OpenAI({ apiKey: SGlobal.env.OPENAI_API_KEY }),

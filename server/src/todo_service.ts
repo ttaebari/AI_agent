@@ -1,3 +1,5 @@
+import { Agentica } from "@agentica/core";
+
 import {
   CreateTodoPayload,
   FindGoalPayload,
