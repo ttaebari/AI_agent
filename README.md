@@ -1,0 +1,1 @@
+npm agentica start
