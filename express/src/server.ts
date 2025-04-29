@@ -1,5 +1,5 @@
-import express from "express";
-import { pool } from "./db.js";
+import express, { Response, Request } from "express";
+import { pool } from "./db";
 import cors from "cors";
 
 const app = express();
@@ -8,16 +8,16 @@ app.use(express.json());
 
 const PORT = 3001;
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
     res.sendFile("index.html", { root: "./public" });
 });
 
 //DB 업데이트 api
-app.post("/todos", async (req, res) => {
+app.post("/todos", async (req: Request, res: Response): Promise<void> => {
     const todo = req.body;
 
     if (!todo || !todo.name || !todo.content) {
-        return res.status(400).json({ error: "Invalid todo data" });
+        res.status(400).json({ error: "Invalid todo data" });
     }
 
     await pool.query(
@@ -30,7 +30,7 @@ app.post("/todos", async (req, res) => {
 });
 
 //DB 조회 api
-app.get("/todos", async (req, res) => {
+app.get("/todos", async (req: Request, res: Response): Promise<void> => {
     try {
         const result = await pool.query("SELECT * FROM todolist");
 
@@ -42,7 +42,7 @@ app.get("/todos", async (req, res) => {
 });
 
 //특정 날짜 이전의 todo 조회 api
-app.get("/todos/filter", async (req, res) => {
+app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
     const date = req.query.date;
     console.log("date", date);
     try {
@@ -52,7 +52,7 @@ app.get("/todos/filter", async (req, res) => {
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: "No todos found before this date" });
+            res.status(404).json({ error: "No todos found before this date" });
         }
 
         res.status(200).json(result.rows);
@@ -63,7 +63,7 @@ app.get("/todos/filter", async (req, res) => {
 });
 
 //특정 todo 조회 api
-app.get("/todos/:Uid", async (req, res) => {
+app.get("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = req.params.Uid;
     console.log("todoUid", todoUid);
 
@@ -71,7 +71,7 @@ app.get("/todos/:Uid", async (req, res) => {
         const result = await pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: "Todo not found" });
+            res.status(404).json({ error: "Todo not found" });
         }
 
         res.status(200).json(result.rows[0]);
@@ -82,7 +82,7 @@ app.get("/todos/:Uid", async (req, res) => {
 });
 
 //특정 todo 삭제 api
-app.delete("/todos/:Uid", async (req, res) => {
+app.delete("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = req.params.Uid;
 
     try {
@@ -90,7 +90,7 @@ app.delete("/todos/:Uid", async (req, res) => {
         const result = await pool.query("DELETE FROM todolist WHERE Uid = $1", [todoUid]);
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ error: "Todo not found" });
+            res.status(404).json({ error: "Todo not found" });
         }
 
         res.status(200).json(row.rows[0]);
@@ -100,7 +100,7 @@ app.delete("/todos/:Uid", async (req, res) => {
     }
 });
 
-app.delete("/alltodos", async (req, res) => {
+app.delete("/alltodos", async (req: Request, res: Response): Promise<void> => {
     try {
         await pool.query("TRUNCATE TABLE todolist");
 
@@ -112,18 +112,18 @@ app.delete("/alltodos", async (req, res) => {
 });
 
 //todo 완료여부 수정 api
-app.patch("/todos/:Uid/toggle", async (req, res) => {
+app.patch("/todos/:Uid/toggle", async (req: Request, res: Response): Promise<void> => {
     const todoUid = req.params.Uid;
 
     try {
         const row = await pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);
         if (row.rowCount === 0) {
-            return res.status(404).json({ error: "Todo not found" });
+            res.status(404).json({ error: "Todo not found" });
         }
 
         const result = await pool.query("UPDATE todolist SET completed = NOT completed WHERE Uid = $1", [todoUid]);
         if (result.rowCount === 0) {
-            return res.status(500).json({ error: "Todo update failed" });
+            res.status(500).json({ error: "Todo update failed" });
         }
 
         res.status(200).json({
@@ -140,11 +140,11 @@ app.patch("/todos/:Uid/toggle", async (req, res) => {
 });
 
 //todo 미완료 목록 조회 api
-app.get("/todos/report", async (req, res) => {
+app.get("/todos/report", async (req: Request, res: Response): Promise<void> => {
     try {
         const result = await pool.query("SELECT * FROM todolist where completed = FALSE");
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: "No todos found" });
+            res.status(404).json({ error: "No todos found" });
         }
 
         res.status(200).json(result.rows);
