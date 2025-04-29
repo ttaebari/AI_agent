@@ -1,4 +1,4 @@
-import { Agentica, IAgenticaHistoryJson } from "@agentica/core";
+import { Agentica, AgenticaHistory } from "@agentica/core";
 import {
   AgenticaRpcService,
   IAgenticaRpcListener,
@@ -6,32 +6,52 @@ import {
 } from "@agentica/rpc";
 import OpenAI from "openai";
 import { WebSocketServer } from "tgrid";
-import typia, { Primitive } from "typia";
+import typia from "typia";
 
 import { SGlobal } from "./SGlobal";
 import { TodoService } from "./todo_service";
 import { WeatherService } from "./weather_service";
 
-const getPromptHistories = async (
-  id: string,
-): Promise<Primitive<IAgenticaHistoryJson>[]> => {
-  // GET PROMPT HISTORIES FROM DATABASE
-  id;
-  return [];
-};
+// const getPromptHistories = async (
+//   id: string,
+// ): Promise<Primitive<IAgenticaHistoryJson>[]> => {
+//   // GET PROMPT HISTORIES FROM DATABASE
+//   id;
+//   return [];
+// };
+
+class CustomAgentica extends Agentica<"chatgpt"> {
+  override async conversate(
+    message: string,
+  ): Promise<AgenticaHistory<"chatgpt">[]> {
+    console.log("[Agentica] 사용자가 보낸 질문:", message);
+
+    const histories = await super.conversate(message);
+    const des = histories.find((m) => m.type === "describe");
+    if (des) {
+      console.log("응답받은 message : ", des.text);
+    }
+    return histories;
+  }
+}
 
 const main = async (): Promise<void> => {
   if (SGlobal.env.OPENAI_API_KEY === undefined)
     console.error("env.OPENAI_API_KEY is not defined.");
 
   const server: WebSocketServer<
-    null,
+    { user: string; roomNumber: number },
     IAgenticaRpcService<"chatgpt">,
     IAgenticaRpcListener
   > = new WebSocketServer();
   await server.open(Number(SGlobal.env.PORT), async (acceptor) => {
-    const url: URL = new URL(`http://localhost${acceptor.path}`);
-    const agent: Agentica<"chatgpt"> = new Agentica({
+    const header = acceptor.header;
+    console.log("user name : ", header.user);
+    console.log("room number : ", header.roomNumber);
+    const driver = acceptor.getDriver();
+
+    // const url: URL = new URL(`http://localhost${acceptor.path}`);
+    const agent: Agentica<"chatgpt"> = new CustomAgentica({
       model: "chatgpt",
       vendor: {
         api: new OpenAI({ apiKey: SGlobal.env.OPENAI_API_KEY }),
@@ -54,15 +74,15 @@ const main = async (): Promise<void> => {
           execute: new WeatherService(),
         },
       ],
-      histories:
-        // check {id} parameter
-        url.pathname === "/"
-          ? []
-          : await getPromptHistories(url.pathname.slice(1)),
+      // histories:
+      //   // check {id} parameter
+      //   url.pathname === "/"
+      //     ? []
+      //     : await getPromptHistories(url.pathname.slice(1)),
     });
     const service: AgenticaRpcService<"chatgpt"> = new AgenticaRpcService({
       agent,
-      listener: acceptor.getDriver(),
+      listener: driver,
     });
     await acceptor.accept(service);
   });

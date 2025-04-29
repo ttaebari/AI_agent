@@ -20,13 +20,23 @@ export function AgenticaRpcProvider({ children }: PropsWithChildren) {
         try {
             setIsError(false);
             const connector: WebSocketConnector<
-                null,
+                { user: string; roomNumber: number },
                 IAgenticaRpcListener,
                 IAgenticaRpcService<"chatgpt">
-            > = new WebSocketConnector<null, IAgenticaRpcListener, IAgenticaRpcService<"chatgpt">>(null, {
-                describe: pushMessage,
-                text: pushMessage,
-            });
+            > = new WebSocketConnector<
+                { user: string; roomNumber: number },
+                IAgenticaRpcListener,
+                IAgenticaRpcService<"chatgpt">
+            >(
+                {
+                    user: "taeho",
+                    roomNumber: 1,
+                },
+                {
+                    describe: pushMessage,
+                    text: pushMessage,
+                }
+            );
             await connector.connect(import.meta.env.VITE_AGENTICA_WS_URL);
             const driver = connector.getDriver();
             setDriver(driver);
@@ -45,6 +55,7 @@ export function AgenticaRpcProvider({ children }: PropsWithChildren) {
             }
             try {
                 await driver.conversate(message);
+                console.log("Message sent front:", message);
             } catch (e) {
                 console.error(e);
                 setIsError(true);
