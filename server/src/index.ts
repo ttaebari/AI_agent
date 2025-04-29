@@ -5,7 +5,6 @@ import {
   IAgenticaRpcService,
 } from "@agentica/rpc";
 import OpenAI from "openai";
-import { text } from "stream/consumers";
 import { WebSocketServer } from "tgrid";
 import typia from "typia";
 
