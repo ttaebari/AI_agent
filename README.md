@@ -1,1 +1,1 @@
-npm agentica start
+npx agentica start
