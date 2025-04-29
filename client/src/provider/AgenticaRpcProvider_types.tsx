@@ -8,6 +8,7 @@ export interface AgenticaRpcContextType {
     isConnected: boolean;
     isError: boolean;
     tryConnect: () => Promise<
-        WebSocketConnector<null, IAgenticaRpcListener, IAgenticaRpcService<"chatgpt">> | undefined
+        | WebSocketConnector<{ user: string; roomNumber: number }, IAgenticaRpcListener, IAgenticaRpcService<"chatgpt">>
+        | undefined
     >;
 }
