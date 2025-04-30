@@ -3,7 +3,6 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import { markdownComponents } from "./MarkdownComponents";
-import { useEffect, useState } from "react";
 
 interface Message {
     id: string;
