@@ -16,7 +16,6 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ message, messageHistory }: ChatMessageProps) {
-    console.log("mMMMMMM", messageHistory);
     const isUser = message.role === "user";
     if (message.role === "assistant") {
         console.log("Assistant message:", message.content);

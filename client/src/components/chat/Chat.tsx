@@ -19,7 +19,7 @@ export function Chat() {
 
     console.log("??");
 
-    const roomNumber = localStorage.getItem("roomNumber");
+    const roomNumber = +localStorage.getItem("roomNumber")!;
     const [messageHistory, setMessageHistory] = useState<{ usermessage: string; aimessage: string }[]>([]);
 
     const Server_URL = "http://localhost:3001";
@@ -27,7 +27,7 @@ export function Chat() {
     useEffect(() => {
         async function fetchMessages() {
             try {
-                const res = await fetch(`${Server_URL}/message/${+roomNumber!}`, {
+                const res = await fetch(`${Server_URL}/message/${roomNumber}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
