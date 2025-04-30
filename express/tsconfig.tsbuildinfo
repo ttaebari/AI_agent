@@ -1,1 +1,7 @@
-{"root":["./db.ts","./server.ts"],"version":"5.8.3"}
+{
+    "root": [
+        "./db.ts",
+        "./server.ts"
+    ],
+    "version": "5.8.3"
+}

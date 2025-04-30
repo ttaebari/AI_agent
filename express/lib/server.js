@@ -29,8 +29,31 @@ app.post("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(400).json({ error: "Invalid todo data" });
     }
     yield db_1.pool.query(`INSERT INTO todolist (Uid, name, content, goal, completed)
-         VALUES ($1, $2, $3, $4, $5)`, [todo.Uid, todo.name, todo.content, todo.goal, todo.completed]);
+        VALUES ($1, $2, $3, $4, $5)`, [todo.Uid, todo.name, todo.content, todo.goal, todo.completed]);
     res.status(201).json({ todo });
+}));
+app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const messages = req.body;
+    if (!messages.user || !messages.roomNumber || !messages.user_text || !messages.Ai_text) {
+        res.status(400).json({ error: "Invalid request data" });
+    }
+    yield db_1.pool.query(`INSERT INTO messagelist (name, RoomId, UserMessage, AiMessage)
+         VALUES ($1, $2, $3 , $4)`, [messages.user, messages.roomNumber, messages.user_text, messages.Ai_text]);
+    res.status(201).json({ message: "Message saved successfully" });
+}));
+app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const roomNumber = req.params.roomNumber;
+    console.log("roomNumber", roomNumber);
+    try {
+        const result = yield db_1.pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
+            roomNumber,
+        ]);
+        res.status(200).json(result.rows);
+    }
+    catch (err) {
+        console.error("DB 조회 실패:", err);
+        res.status(500).json({ error: "Failed to fetch messages" });
+    }
 }));
 //DB 조회 api
 app.get("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

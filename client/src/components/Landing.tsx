@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 
-export function Landing() {
+type Props = {
+    roomNumber: number;
+    setRoomNumber: (room: number) => void;
+};
+
+export function Landing({ roomNumber, setRoomNumber }: Props) {
     const [todos, setTodos] = useState<
         {
             uid: number;
@@ -11,9 +16,11 @@ export function Landing() {
         }[]
     >([]);
 
+    const Server_URL = "http://localhost:3001";
+
     async function fetchTodos() {
         try {
-            const res = await fetch("http://localhost:3001/todos", {
+            const res = await fetch(`${Server_URL}/todos`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -34,8 +41,30 @@ export function Landing() {
     }, []);
 
     return (
-        <section className="flex-1 flex flex-col items-center justify-center p-8 relative">
-            <div className="space-y-8">
+        <section className=" flex-1 flex flex-col items-center justify-center p-8 relative">
+            <button
+                onClick={() => {
+                    localStorage.setItem("roomNumber", "1");
+                    setRoomNumber(1);
+                }}
+                className={`px-4 py-2 h-[80px] text-black bg-blue-600 rounded ${
+                    roomNumber === 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+                }`}
+            >
+                Room 1
+            </button>
+            <button
+                onClick={() => {
+                    localStorage.setItem("roomNumber", "2");
+                    setRoomNumber(2);
+                }}
+                className={`px-4 py-2 h-[80px] text-black bg-blue-600 rounded ${
+                    roomNumber === 2 ? "bg-blue-500 text-white" : "bg-gray-200"
+                }`}
+            >
+                Room 2
+            </button>
+            <div className=" space-y-8">
                 <div className="space-y-4 text-center">
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-100 to-white bg-clip-text text-transparent">
                         Todo List

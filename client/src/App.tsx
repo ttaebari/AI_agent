@@ -1,5 +1,5 @@
 import { Chat } from "./components/chat/Chat";
-import { Landing } from "./components/Landing";
+import { LandingPageWrapper } from "./components/LandingPageWrapper";
 import { AgenticaRpcProvider } from "./provider/AgenticaRpcProvider";
 
 const App = () => {
@@ -12,7 +12,7 @@ const App = () => {
             {/* Content */}
             <div className="relative flex w-full min-h-screen">
                 <div className="hidden lg:flex md:flex-1">
-                    <Landing />
+                    <LandingPageWrapper />
                 </div>
                 <AgenticaRpcProvider>
                     <Chat />

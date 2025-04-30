@@ -2,7 +2,7 @@ import { useAgenticaRpc } from "../../provider/AgenticaRpcProvider";
 import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 import { ChatStatus } from "./ChatStatus";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function Chat() {
     const { messages, conversate, isConnected, isError, tryConnect } = useAgenticaRpc();
@@ -16,6 +16,39 @@ export function Chat() {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
     };
+
+    console.log("??");
+
+    const roomNumber = localStorage.getItem("roomNumber");
+    const [messageHistory, setMessageHistory] = useState<{ usermessage: string; aimessage: string }[]>([]);
+
+    const Server_URL = "http://localhost:3001";
+    console.log("roomNumber", roomNumber);
+    useEffect(() => {
+        async function fetchMessages() {
+            try {
+                const res = await fetch(`${Server_URL}/message/${+roomNumber!}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                const messages = await res.json();
+                if (!res.ok) {
+                    throw new Error("Failed to fetch messages");
+                }
+                setMessageHistory(messages);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+                setMessageHistory([]);
+            }
+        }
+        if (roomNumber) {
+            fetchMessages();
+            console.log("useEffect", roomNumber);
+        }
+    }, [roomNumber]);
+    console.log("message_", messageHistory);
 
     useEffect(() => {
         scrollToBottom();
@@ -34,7 +67,7 @@ export function Chat() {
             <div className="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
                 <div className="h-full flex flex-col bg-zinc-800/50 backdrop-blur-md rounded-2xl overflow-hidden border border-zinc-700/30">
                     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
-                        {hasMessage && <ChatMessages messages={messages} />}
+                        <ChatMessages messages={messages} messageHistory={messageHistory} />
                         <ChatStatus
                             isError={isError}
                             isConnected={isConnected}

@@ -6,7 +6,11 @@ import { AgenticaRpcContextType } from "./AgenticaRpcProvider_types";
 
 const AgenticaRpcContext = createContext<AgenticaRpcContextType | null>(null);
 
-export function AgenticaRpcProvider({ children }: PropsWithChildren) {
+export function AgenticaRpcProvider({
+    children,
+    user = "taeho",
+    roomNumber = 1,
+}: PropsWithChildren<{ user?: string; roomNumber?: number }>) {
     const [messages, setMessages] = useState<IAgenticaEventJson[]>([]);
     const [isError, setIsError] = useState(false);
     const [driver, setDriver] = useState<Driver<IAgenticaRpcService<"chatgpt">, false>>();
@@ -28,10 +32,7 @@ export function AgenticaRpcProvider({ children }: PropsWithChildren) {
                 IAgenticaRpcListener,
                 IAgenticaRpcService<"chatgpt">
             >(
-                {
-                    user: "taeho",
-                    roomNumber: 1,
-                },
+                { user, roomNumber },
                 {
                     describe: pushMessage,
                     text: pushMessage,
@@ -45,7 +46,7 @@ export function AgenticaRpcProvider({ children }: PropsWithChildren) {
             console.error(e);
             setIsError(true);
         }
-    }, [pushMessage]);
+    }, [pushMessage, user, roomNumber]);
 
     const conversate = useCallback(
         async (message: string) => {

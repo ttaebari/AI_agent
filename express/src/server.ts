@@ -22,11 +22,41 @@ app.post("/todos", async (req: Request, res: Response): Promise<void> => {
 
     await pool.query(
         `INSERT INTO todolist (Uid, name, content, goal, completed)
-         VALUES ($1, $2, $3, $4, $5)`,
+        VALUES ($1, $2, $3, $4, $5)`,
         [todo.Uid, todo.name, todo.content, todo.goal, todo.completed]
     );
 
     res.status(201).json({ todo });
+});
+
+app.post("/message", async (req: Request, res: Response): Promise<void> => {
+    const messages = req.body;
+
+    if (!messages.user || !messages.roomNumber || !messages.user_text || !messages.Ai_text) {
+        res.status(400).json({ error: "Invalid request data" });
+    }
+
+    await pool.query(
+        `INSERT INTO messagelist (name, RoomId, UserMessage, AiMessage)
+         VALUES ($1, $2, $3 , $4)`,
+        [messages.user, messages.roomNumber, messages.user_text, messages.Ai_text]
+    );
+    res.status(201).json({ message: "Message saved successfully" });
+});
+
+app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<void> => {
+    const roomNumber = req.params.roomNumber;
+    console.log("roomNumber", roomNumber);
+
+    try {
+        const result = await pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
+            roomNumber,
+        ]);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error("DB 조회 실패:", err);
+        res.status(500).json({ error: "Failed to fetch messages" });
+    }
 });
 
 //DB 조회 api
