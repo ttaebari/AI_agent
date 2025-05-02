@@ -46,7 +46,7 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
 
 app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<void> => {
     const roomNumber = req.params.roomNumber;
-    console.log("roomNumber", roomNumber);
+    console.log("roomNumber api!!!", roomNumber);
 
     try {
         const result = await pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
@@ -54,7 +54,7 @@ app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<voi
         ]);
         res.status(200).json(result.rows);
     } catch (err) {
-        console.error("DB 조회 실패:", err);
+        console.error("message DB 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch messages" });
     }
 });

@@ -23,6 +23,7 @@ export function ChatMessage({ message, messageHistory }: ChatMessageProps) {
     return (
         <>
             {messageHistory &&
+                messageHistory.length > 0 &&
                 messageHistory.map((message, index) => (
                     <div key={index} className="flex flex-col gap-2 my-2">
                         {/* User Message - 오른쪽 정렬 */}

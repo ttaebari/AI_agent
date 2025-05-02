@@ -1,24 +1,31 @@
-import { Agentica, AgenticaHistory } from "@agentica/core";
+import {
+  Agentica,
+  AgenticaHistory,
+  IAgenticaHistoryJson,
+} from "@agentica/core";
 import {
   AgenticaRpcService,
   IAgenticaRpcListener,
   IAgenticaRpcService,
 } from "@agentica/rpc";
+import { Agent } from "http";
 import OpenAI from "openai";
 import { WebSocketServer } from "tgrid";
-import typia from "typia";
+import typia, { Primitive } from "typia";
 
 import { SGlobal } from "./SGlobal";
 import { TodoService } from "./todo_service";
 import { WeatherService } from "./weather_service";
 
-// const getPromptHistories = async (
-//   id: string,
-// ): Promise<Primitive<IAgenticaHistoryJson>[]> => {
-//   // GET PROMPT HISTORIES FROM DATABASE
-//   id;
-//   return [];
-// };
+const getPromptHistories = async (
+  userid: string,
+  roomNumber: number,
+): Promise<Primitive<IAgenticaHistoryJson>[]> => {
+  // GET PROMPT HISTORIES FROM DATABASE
+  userid;
+  roomNumber;
+  return [];
+};
 
 class CustomAgentica extends Agentica<"chatgpt"> {
   private user: string;
@@ -33,7 +40,12 @@ class CustomAgentica extends Agentica<"chatgpt"> {
     this.user = user;
     this.roomNumber = roomNumber;
   }
-
+  public setRoomNumber(roomNumber: number): number {
+    console.log("setRoomNumber", roomNumber);
+    this.roomNumber = roomNumber;
+    console.log("settingRoomNumber", this.roomNumber);
+    return this.roomNumber;
+  }
   override async conversate(
     message: string,
   ): Promise<AgenticaHistory<"chatgpt">[]> {
@@ -87,6 +99,7 @@ const main = async (): Promise<void> => {
   > = new WebSocketServer();
   await server.open(Number(SGlobal.env.PORT), async (acceptor) => {
     const header = acceptor.header;
+    const { user, roomNumber } = header;
     console.log("user name : ", header.user);
     console.log("room number : ", header.roomNumber);
     const driver = acceptor.getDriver();
@@ -116,15 +129,18 @@ const main = async (): Promise<void> => {
             execute: new WeatherService(),
           },
         ],
-        // histories:
-        //   // check {id} parameter
-        //   url.pathname === "/"
-        //     ? []
-        //     : await getPromptHistories(url.pathname.slice(1)),
+        histories: await getPromptHistories(user, roomNumber),
       },
-      header.user,
-      header.roomNumber,
+      user,
+      roomNumber,
     );
+    console.log("agent", agent);
+    console.log("11");
+    if (agent instanceof CustomAgentica) {
+      console.log("agent is CustomAgentica");
+      agent.setRoomNumber(header.roomNumber);
+    }
+    console.log("22");
     const service: AgenticaRpcService<"chatgpt"> = new AgenticaRpcService({
       agent,
       listener: driver,

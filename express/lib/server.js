@@ -43,7 +43,7 @@ app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* (
 }));
 app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomNumber = req.params.roomNumber;
-    console.log("roomNumber", roomNumber);
+    console.log("roomNumber api!!!", roomNumber);
     try {
         const result = yield db_1.pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
             roomNumber,
@@ -51,7 +51,7 @@ app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, 
         res.status(200).json(result.rows);
     }
     catch (err) {
-        console.error("DB 조회 실패:", err);
+        console.error("message DB 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch messages" });
     }
 }));

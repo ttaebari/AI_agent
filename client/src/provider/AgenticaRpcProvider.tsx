@@ -13,7 +13,8 @@ export function AgenticaRpcProvider({
 }: PropsWithChildren<{ user?: string; roomNumber?: number }>) {
     const [messages, setMessages] = useState<IAgenticaEventJson[]>([]);
     const [isError, setIsError] = useState(false);
-    const [driver, setDriver] = useState<Driver<IAgenticaRpcService<"chatgpt">, false>>();
+    const [driver, setDriver] = useState<Driver<IAgenticaRpcService<"chatgpt">, false> | null>(null);
+    const [connector, setConnector] = useState<WebSocketConnector<any, any, any> | null>(null);
 
     const pushMessage = useCallback(
         async (message: IAgenticaEventJson) => setMessages((prev) => [...prev, message]),
@@ -23,11 +24,7 @@ export function AgenticaRpcProvider({
     const tryConnect = useCallback(async () => {
         try {
             setIsError(false);
-            const connector: WebSocketConnector<
-                { user: string; roomNumber: number },
-                IAgenticaRpcListener,
-                IAgenticaRpcService<"chatgpt">
-            > = new WebSocketConnector<
+            const conn = new WebSocketConnector<
                 { user: string; roomNumber: number },
                 IAgenticaRpcListener,
                 IAgenticaRpcService<"chatgpt">
@@ -38,25 +35,27 @@ export function AgenticaRpcProvider({
                     text: pushMessage,
                 }
             );
-            await connector.connect(import.meta.env.VITE_AGENTICA_WS_URL);
-            const driver = connector.getDriver();
-            setDriver(driver);
-            return connector;
+
+            await conn.connect(import.meta.env.VITE_AGENTICA_WS_URL);
+            const drv = conn.getDriver();
+            setDriver(drv);
+            setConnector(conn);
+            return conn;
         } catch (e) {
             console.error(e);
             setIsError(true);
+            return undefined;
         }
-    }, [pushMessage, user, roomNumber]);
+    }, [user, roomNumber, pushMessage]);
 
     const conversate = useCallback(
         async (message: string) => {
             if (!driver) {
-                console.error("Driver is not connected. Please connect to the server.");
+                console.error("Driver is not connected.");
                 return;
             }
             try {
                 await driver.conversate(message);
-                console.log("Message sent front:", message);
             } catch (e) {
                 console.error(e);
                 setIsError(true);
@@ -65,17 +64,20 @@ export function AgenticaRpcProvider({
         [driver]
     );
 
-    useEffect(() => {
-        (async () => {
-            const connector = await tryConnect();
-            return () => {
-                connector?.close();
-                setDriver(undefined);
-            };
-        })();
-    }, [tryConnect]);
-
     const isConnected = !!driver;
+    useEffect(() => {
+        console.log("roomNumber!!!!", roomNumber);
+        (async () => {
+            if (connector) {
+                console.log("connector", connector);
+                await connector.close();
+                setDriver(null);
+                setConnector(null);
+            }
+
+            tryConnect();
+        })();
+    }, [roomNumber, user]);
 
     return (
         <AgenticaRpcContext.Provider value={{ messages, conversate, isConnected, isError, tryConnect }}>
