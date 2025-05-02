@@ -7,7 +7,6 @@ export class WeatherService {
    * find weather
    */
   public async Weather(props: CreateWeatherPayload): Promise<Weather> {
-    console.log(props.location);
     const response = await fetch(
       `https://goweather.herokuapp.com/weather/${props.location}`,
     );

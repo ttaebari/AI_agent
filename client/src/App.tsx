@@ -1,8 +1,14 @@
 import { Chat } from "./components/chat/Chat";
 import { LandingPageWrapper } from "./components/LandingPageWrapper";
 import { AgenticaRpcProvider } from "./provider/AgenticaRpcProvider";
+import { useState } from "react";
 
 const App = () => {
+    const [roomNumber, setRoomNumber] = useState(1);
+    const user = "taeho";
+    const handleChangeRoomnumber = (roomNumber: number) => {
+        setRoomNumber(roomNumber);
+    };
     return (
         <div className="relative min-h-screen">
             {/* Shared Background */}
@@ -14,8 +20,8 @@ const App = () => {
                 <div className="hidden lg:flex md:flex-1">
                     <LandingPageWrapper />
                 </div>
-                <AgenticaRpcProvider>
-                    <Chat />
+                <AgenticaRpcProvider user={user} roomNumber={roomNumber}>
+                    <Chat roomNumber={roomNumber} setRoomNumber={handleChangeRoomnumber} />
                 </AgenticaRpcProvider>
             </div>
         </div>

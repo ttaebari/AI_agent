@@ -1,7 +1,6 @@
 import { IAgenticaEventJson } from "@agentica/core";
 import { ChatMessage } from "./ChatMessage";
 import { ChatMessageHistory } from "./ChatMessageHistory";
-import { useState } from "react";
 
 interface ChatMessagesProps {
     messages: IAgenticaEventJson[];
@@ -9,13 +8,10 @@ interface ChatMessagesProps {
 }
 
 export function ChatMessages({ messages, messageHistory }: ChatMessagesProps) {
-    console.log("!!");
-    const [roomNumber] = useState(+localStorage.getItem("roomNumber")!);
-
     return (
         <>
             <ChatMessageHistory
-                key={`history-${roomNumber}`}
+                key={0}
                 message={{
                     id: "0",
                     role: "assistant",

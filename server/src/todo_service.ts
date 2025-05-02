@@ -76,7 +76,6 @@ export class TodoService {
    */
   public async findByUid(props: FindTodoPayload): Promise<ITodo> {
     const Uid = props.Uid;
-    console.log("Uid", Uid);
     const response = await fetch(`${TodoService.server_url}/todos/${Uid}`, {
       method: "GET",
       headers: {
@@ -98,7 +97,6 @@ export class TodoService {
    */
   public async findByDate(props: FindGoalPayload): Promise<ITodo[]> {
     const date = props.goal;
-    console.log("date", date);
 
     const response = await fetch(
       `${TodoService.server_url}/todos/filter?date=${date}`,

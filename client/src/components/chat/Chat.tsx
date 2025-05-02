@@ -4,7 +4,13 @@ import { ChatMessages } from "./ChatMessages";
 import { ChatStatus } from "./ChatStatus";
 import { useEffect, useRef, useState } from "react";
 
-export function Chat() {
+export function Chat({
+    roomNumber,
+    setRoomNumber,
+}: {
+    roomNumber: number;
+    setRoomNumber: (roomNumber: number) => void;
+}) {
     const { messages, conversate, isConnected, isError, tryConnect } = useAgenticaRpc();
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const hasMessage = messages.length > 0;
@@ -17,9 +23,7 @@ export function Chat() {
         }
     };
 
-    const [roomNumber, setRoomNumber] = useState(+localStorage.getItem("roomNumber")!);
     const [messageHistory, setMessageHistory] = useState<{ usermessage: string; aimessage: string }[]>([]);
-
     const Server_URL = "http://localhost:3001";
     useEffect(() => {
         async function fetchMessages() {
@@ -42,13 +46,8 @@ export function Chat() {
         }
         if (roomNumber) {
             fetchMessages();
-            console.log("useEffect", roomNumber);
         }
     }, [roomNumber]);
-
-    console.log("roomNumber", roomNumber);
-
-    console.log("message_", messageHistory);
 
     useEffect(() => {
         scrollToBottom();
@@ -67,8 +66,6 @@ export function Chat() {
             <div className="absolute top-4 left-4 flex gap-2 z-10">
                 <button
                     onClick={() => {
-                        localStorage.setItem("roomNumber", "1");
-                        window.dispatchEvent(new CustomEvent("roomNumberChange", { detail: "1" }));
                         setRoomNumber(1);
                     }}
                     className={`text-sm px-3 py-1 rounded-md border ${
@@ -79,8 +76,6 @@ export function Chat() {
                 </button>
                 <button
                     onClick={() => {
-                        localStorage.setItem("roomNumber", "2");
-                        window.dispatchEvent(new CustomEvent("roomNumberChange", { detail: "2" }));
                         setRoomNumber(2);
                     }}
                     className={`text-sm px-3 py-1 rounded-md border ${

@@ -74,7 +74,6 @@ app.get("/todos", async (req: Request, res: Response): Promise<void> => {
 //특정 날짜 이전의 todo 조회 api
 app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
     const date = req.query.date;
-    console.log("date", date);
     try {
         const result = await pool.query(
             "SELECT * FROM todolist WHERE TO_DATE(goal, 'YYYY-MM-DD') < TO_DATE($1, 'YYYY-MM-DD')",
@@ -95,7 +94,6 @@ app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
 //특정 todo 조회 api
 app.get("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = req.params.Uid;
-    console.log("todoUid", todoUid);
 
     try {
         const result = await pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);

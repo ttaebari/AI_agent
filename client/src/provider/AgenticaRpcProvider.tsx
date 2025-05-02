@@ -65,11 +65,11 @@ export function AgenticaRpcProvider({
     );
 
     const isConnected = !!driver;
+
     useEffect(() => {
         console.log("roomNumber!!!!", roomNumber);
         (async () => {
             if (connector) {
-                console.log("connector", connector);
                 await connector.close();
                 setDriver(null);
                 setConnector(null);
@@ -77,7 +77,7 @@ export function AgenticaRpcProvider({
 
             tryConnect();
         })();
-    }, [roomNumber, user]);
+    }, [roomNumber]);
 
     return (
         <AgenticaRpcContext.Provider value={{ messages, conversate, isConnected, isError, tryConnect }}>
