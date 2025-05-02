@@ -69,7 +69,6 @@ app.get("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 //특정 날짜 이전의 todo 조회 api
 app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const date = req.query.date;
-    console.log("date", date);
     try {
         const result = yield db_1.pool.query("SELECT * FROM todolist WHERE TO_DATE(goal, 'YYYY-MM-DD') < TO_DATE($1, 'YYYY-MM-DD')", [date]);
         if (result.rows.length === 0) {
@@ -85,7 +84,6 @@ app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, functio
 //특정 todo 조회 api
 app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = req.params.Uid;
-    console.log("todoUid", todoUid);
     try {
         const result = yield db_1.pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);
         if (result.rows.length === 0) {

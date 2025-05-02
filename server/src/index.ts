@@ -8,7 +8,6 @@ import {
   IAgenticaRpcListener,
   IAgenticaRpcService,
 } from "@agentica/rpc";
-import { Agent } from "http";
 import OpenAI from "openai";
 import { WebSocketServer } from "tgrid";
 import typia, { Primitive } from "typia";
