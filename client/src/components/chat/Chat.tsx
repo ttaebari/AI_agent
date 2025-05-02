@@ -63,31 +63,34 @@ export function Chat() {
     };
 
     return (
-        <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 min-w-0">
-            <button
-                onClick={() => {
-                    localStorage.setItem("roomNumber", "1");
-                    window.dispatchEvent(new CustomEvent("roomNumberChange", { detail: "1" }));
-                    setRoomNumber(1);
-                }}
-                className={`px-4 py-2 h-[80px] text-black bg-blue-600 rounded ${
-                    roomNumber === 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-                }`}
-            >
-                Room 1
-            </button>
-            <button
-                onClick={() => {
-                    localStorage.setItem("roomNumber", "2");
-                    window.dispatchEvent(new CustomEvent("roomNumberChange", { detail: "2" }));
-                    setRoomNumber(2);
-                }}
-                className={`px-4 py-2 h-[80px] text-black bg-blue-600 rounded ${
-                    roomNumber === 2 ? "bg-blue-500 text-white" : "bg-gray-200"
-                }`}
-            >
-                Room 2
-            </button>
+        <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 min-w-0 relative">
+            <div className="absolute top-4 left-4 flex gap-2 z-10">
+                <button
+                    onClick={() => {
+                        localStorage.setItem("roomNumber", "1");
+                        window.dispatchEvent(new CustomEvent("roomNumberChange", { detail: "1" }));
+                        setRoomNumber(1);
+                    }}
+                    className={`text-sm px-3 py-1 rounded-md border ${
+                        roomNumber === 1 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
+                    }`}
+                >
+                    Room 1
+                </button>
+                <button
+                    onClick={() => {
+                        localStorage.setItem("roomNumber", "2");
+                        window.dispatchEvent(new CustomEvent("roomNumberChange", { detail: "2" }));
+                        setRoomNumber(2);
+                    }}
+                    className={`text-sm px-3 py-1 rounded-md border ${
+                        roomNumber === 2 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
+                    }`}
+                >
+                    Room 2
+                </button>
+            </div>
+
             <div className="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
                 <div className="h-full flex flex-col bg-zinc-800/50 backdrop-blur-md rounded-2xl overflow-hidden border border-zinc-700/30">
                     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
@@ -100,7 +103,6 @@ export function Chat() {
                             isWsUrlConfigured={import.meta.env.VITE_AGENTICA_WS_URL !== ""}
                         />
                     </div>
-
                     <div className="p-4">
                         <ChatInput
                             onSendMessage={handleSendMessage}
