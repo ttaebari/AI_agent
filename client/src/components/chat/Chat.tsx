@@ -49,9 +49,9 @@ export function Chat({
         }
     }, [roomNumber]);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+    // useEffect(() => {
+    //     scrollToBottom();
+    // }, [messages]);
 
     const handleSendMessage = async (content: string) => {
         try {
