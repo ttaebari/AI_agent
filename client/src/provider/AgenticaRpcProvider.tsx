@@ -67,7 +67,7 @@ export function AgenticaRpcProvider({
     const isConnected = !!driver;
 
     useEffect(() => {
-        console.log("roomNumber!!!!", roomNumber);
+        setMessages([]);
         (async () => {
             if (connector) {
                 await connector.close();
