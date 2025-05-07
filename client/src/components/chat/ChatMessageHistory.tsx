@@ -15,8 +15,6 @@ interface ChatMessageProps {
 export function ChatMessageHistory({ messageHistory }: ChatMessageProps) {
     const [showHistory, setShowHistory] = useState(false);
 
-    const toggleHistory = () => setShowHistory((prev) => !prev);
-
     return (
         <div className="my-4">
             {showHistory &&
@@ -39,7 +37,7 @@ export function ChatMessageHistory({ messageHistory }: ChatMessageProps) {
             {messageHistory && messageHistory.length > 0 && (
                 <div className="flex justify-center mb-4">
                     <button
-                        onClick={toggleHistory}
+                        onClick={() => setShowHistory((prev) => !prev)}
                         className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                     >
                         {showHistory ? "이전 대화 숨기기" : "이전 대화 불러오기"}
