@@ -33,6 +33,31 @@ export function AgenticaRpcProvider({
                 {
                     describe: pushMessage,
                     text: pushMessage,
+                    initialize: async (evt) => {
+                        console.log("initialize evt", evt);
+                    },
+                    select: async (evt) => {
+                        console.log("select evt", evt);
+                        const reason = evt.selection.reason;
+                        const operation = evt.selection.operation.function;
+                        alert(`\"${reason}\"의 이유로 \"${operation}\" 함수 선택`);
+                    },
+                    cancel: async (evt) => {
+                        console.log("cancel evt", evt);
+                    },
+                    call: async (evt) => {
+                        console.log("call evt", evt);
+                        if (evt.operation.function === "create") {
+                            return {
+                                ...evt.arguments,
+                                name: evt.arguments.name + "씨",
+                            };
+                        }
+                        return null;
+                    },
+                    execute: async (evt) => {
+                        console.log("execute evt", evt);
+                    },
                 }
             );
 
