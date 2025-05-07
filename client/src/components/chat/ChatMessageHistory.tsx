@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "highlight.js/styles/github-dark.css";
 
 interface Message {
@@ -12,25 +13,39 @@ interface ChatMessageProps {
 }
 
 export function ChatMessageHistory({ messageHistory }: ChatMessageProps) {
+    const [showHistory, setShowHistory] = useState(false);
+
+    const toggleHistory = () => setShowHistory((prev) => !prev);
+
     return (
-        <>
-            {messageHistory &&
-                messageHistory.length > 0 &&
+        <div className="my-4">
+            {showHistory &&
+                messageHistory &&
                 messageHistory.map((message, index) => (
                     <div key={index} className="flex flex-col gap-2 my-2">
                         <div className="flex justify-end">
-                            <div className="bg-white text-zinc-900 rounded= 2xl px-4 py-3 rounded-lg max-w-xs break-words text-sm">
+                            <div className="bg-white text-zinc-900 px-4 py-3 rounded-lg max-w-xs break-words text-sm">
                                 {message.aimessage}
                             </div>
                         </div>
 
                         <div className="flex justify-start">
-                            <div className="bg-zinc-700/50 text--100 rounded= 2xl px-4 py-3 rounded-lg max-w-xs break-words text-sm">
+                            <div className="bg-zinc-700/50 text-white px-4 py-3 rounded-lg max-w-xs break-words text-sm">
                                 {message.usermessage}
                             </div>
                         </div>
                     </div>
                 ))}
-        </>
+            {messageHistory && messageHistory.length > 0 && (
+                <div className="flex justify-center mb-4">
+                    <button
+                        onClick={toggleHistory}
+                        className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                        {showHistory ? "이전 대화 숨기기" : "이전 대화 불러오기"}
+                    </button>
+                </div>
+            )}
+        </div>
     );
 }
