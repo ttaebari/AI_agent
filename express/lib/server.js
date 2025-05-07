@@ -45,7 +45,6 @@ app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* (
 //room별 message 조회
 app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomNumber = req.params.roomNumber;
-    console.log("roomNumber api!!!", roomNumber);
     try {
         const result = yield db_1.pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
             roomNumber,

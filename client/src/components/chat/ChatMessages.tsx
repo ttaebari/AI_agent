@@ -21,7 +21,7 @@ export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessa
             const UserMessage = messages[messages.length - 1];
             UserMessage.type === "text" ? (user_text = UserMessage.text) : (user_text = "");
             const AiMessage = messages[messages.length - 2];
-            AiMessage.type === "text" ? (ai_text = AiMessage.text) : (ai_text = "");
+            AiMessage.type === "text" || AiMessage.type === "describe" ? (ai_text = AiMessage.text) : (ai_text = "");
         }
 
         const sendMessage = async () => {

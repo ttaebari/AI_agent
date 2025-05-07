@@ -1,8 +1,4 @@
-import {
-  Agentica,
-  AgenticaHistory,
-  IAgenticaHistoryJson,
-} from "@agentica/core";
+import { Agentica, IAgenticaHistoryJson } from "@agentica/core";
 import {
   AgenticaRpcService,
   IAgenticaRpcListener,

@@ -48,7 +48,6 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
 //room별 message 조회
 app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<void> => {
     const roomNumber = req.params.roomNumber;
-    console.log("roomNumber api!!!", roomNumber);
 
     try {
         const result = await pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
