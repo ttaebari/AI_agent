@@ -20,13 +20,13 @@ export function ChatMessageHistory({ messageHistory }: ChatMessageProps) {
                     <div key={index} className="flex flex-col gap-2 my-2">
                         <div className="flex justify-end">
                             <div className="bg-white text-zinc-900 rounded= 2xl px-4 py-3 rounded-lg max-w-xs break-words text-sm">
-                                {message.usermessage}
+                                {message.aimessage}
                             </div>
                         </div>
 
                         <div className="flex justify-start">
                             <div className="bg-zinc-700/50 text--100 rounded= 2xl px-4 py-3 rounded-lg max-w-xs break-words text-sm">
-                                {message.aimessage}
+                                {message.usermessage}
                             </div>
                         </div>
                     </div>

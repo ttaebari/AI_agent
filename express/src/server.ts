@@ -29,6 +29,7 @@ app.post("/todos", async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ todo });
 });
 
+//message 저장
 app.post("/message", async (req: Request, res: Response): Promise<void> => {
     const messages = req.body;
 
@@ -44,6 +45,7 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ message: "Message saved successfully" });
 });
 
+//room별 message 조회
 app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<void> => {
     const roomNumber = req.params.roomNumber;
     console.log("roomNumber api!!!", roomNumber);

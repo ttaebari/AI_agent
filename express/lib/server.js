@@ -32,6 +32,7 @@ app.post("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         VALUES ($1, $2, $3, $4, $5)`, [todo.Uid, todo.name, todo.content, todo.goal, todo.completed]);
     res.status(201).json({ todo });
 }));
+//message 저장
 app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const messages = req.body;
     if (!messages.user || !messages.roomNumber || !messages.user_text || !messages.Ai_text) {
@@ -41,6 +42,7 @@ app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* (
          VALUES ($1, $2, $3 , $4)`, [messages.user, messages.roomNumber, messages.user_text, messages.Ai_text]);
     res.status(201).json({ message: "Message saved successfully" });
 }));
+//room별 message 조회
 app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomNumber = req.params.roomNumber;
     console.log("roomNumber api!!!", roomNumber);

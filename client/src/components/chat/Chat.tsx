@@ -89,7 +89,7 @@ export function Chat({
             <div className="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
                 <div className="h-full flex flex-col bg-zinc-800/50 backdrop-blur-md rounded-2xl overflow-hidden border border-zinc-700/30">
                     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
-                        <ChatMessages messages={messages} messageHistory={messageHistory} />
+                        <ChatMessages messages={messages} messageHistory={messageHistory} roomNumber={roomNumber} />
                         <ChatStatus
                             isError={isError}
                             isConnected={isConnected}
