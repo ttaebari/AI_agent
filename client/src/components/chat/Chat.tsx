@@ -23,7 +23,7 @@ export function Chat({
         }
     };
 
-    const [messageHistory, setMessageHistory] = useState<{ UserMessage: string; AiMessage: string }[]>([]);
+    const [messageHistory, setMessageHistory] = useState<{ usermessage: string; aimessage: string }[]>([]);
     const Server_URL = "http://localhost:3001";
     useEffect(() => {
         async function fetchMessages() {

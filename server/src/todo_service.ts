@@ -96,6 +96,7 @@ export class TodoService {
    * @param props date를 포함 이 날짜보다 작거나 같은 Todo를 찾는 메소드
    */
   public async findByDate(props: FindGoalPayload): Promise<ITodo[]> {
+    // date는 YYYY-MM-DD 형식으로 바뀌어야함.
     const date = props.goal;
 
     const response = await fetch(
@@ -190,5 +191,13 @@ export class TodoService {
     }
     const result = (await response.json()) as ITodo[];
     return result;
+  }
+
+  /**
+   * 사용자가 할일 홈페이지 보여줘 라고 요청했을 때 쓰는 메소드
+   * @returns 사용자가 할일 홈페이지 URL
+   */
+  public async goTodoPage(): Promise<string> {
+    return "https://broanex.ncpworkplace.com/v/home/";
   }
 }

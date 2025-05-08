@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
 
 export function Landing() {
     const [todos, setTodos] = useState<
         {
-            Uid: number;
+            uid: number;
             name: string;
             content: string;
-            goal: string;
+            goaldate: Date;
             completed: boolean;
         }[]
     >([]);
@@ -59,11 +60,13 @@ export function Landing() {
                                 </thead>
                                 <tbody>
                                     {todos.map((todo) => (
-                                        <tr key={todo.Uid}>
-                                            <td className="border border-white/20 p-2">{todo.Uid}</td>
+                                        <tr key={todo.uid}>
+                                            <td className="border border-white/20 p-2">{todo.uid}</td>
                                             <td className="border border-white/20 p-2">{todo.name}</td>
                                             <td className="border border-white/20 p-2">{todo.content}</td>
-                                            <td className="border border-white/20 p-2">{todo.goal}까지</td>
+                                            <td className="border border-white/20 p-2">
+                                                {todo.goaldate ? todo.goaldate.toString().split("T")[0] : ""}까지
+                                            </td>
                                             <td className="border border-white/20 p-2">
                                                 <input type="checkbox" checked={todo.completed} onChange={() => {}} />
                                             </td>

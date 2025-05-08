@@ -9,7 +9,7 @@ interface Message {
 
 interface ChatMessageProps {
     message: Message;
-    messageHistory?: { UserMessage: string; AiMessage: string }[];
+    messageHistory?: { usermessage: string; aimessage: string }[];
 }
 
 export function ChatMessageHistory({ messageHistory }: ChatMessageProps) {
@@ -23,13 +23,13 @@ export function ChatMessageHistory({ messageHistory }: ChatMessageProps) {
                     <div key={index} className="flex flex-col gap-2 my-2">
                         <div className="flex justify-end">
                             <div className="bg-white text-zinc-900 px-4 py-3 rounded-lg max-w-xs break-words text-sm">
-                                {message.UserMessage}
+                                {message.usermessage}
                             </div>
                         </div>
 
                         <div className="flex justify-start">
                             <div className="bg-zinc-700/50 text-white px-4 py-3 rounded-lg max-w-xs break-words text-sm">
-                                {message.AiMessage}
+                                {message.aimessage}
                             </div>
                         </div>
                     </div>

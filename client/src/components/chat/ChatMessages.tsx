@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 interface ChatMessagesProps {
     messages: IAgenticaEventJson[];
-    messageHistory: { UserMessage: string; AiMessage: string }[];
+    messageHistory: { usermessage: string; aimessage: string }[];
     roomNumber: number;
 }
 

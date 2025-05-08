@@ -25,18 +25,20 @@ app.get("/", (req, res) => {
 });
 // todo 생성
 app.post("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { Uid, name, content, completed, goal } = req.body;
+    const { Uid: uid, name, content, completed, goal: goalstring } = req.body;
+    const goal = goalstring ? new Date(goalstring) : new Date();
     if (!name || !content) {
         res.status(400).json({ error: "Invalid todo data" });
+        return;
     }
     try {
         const todo = yield prisma.todolist.create({
             data: {
-                Uid,
+                uid,
                 name,
                 content,
+                goaldate: goal,
                 completed,
-                goal,
             },
         });
         res.status(201).json({ todo });
@@ -56,9 +58,9 @@ app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const message = yield prisma.messagelist.create({
             data: {
                 name: user,
-                RoomId: roomNumber,
-                UserMessage: user_text,
-                AiMessage: ai_text,
+                roomid: roomNumber,
+                usermessage: user_text,
+                aimessage: ai_text,
             },
         });
         res.status(201).json({ message });
@@ -73,8 +75,8 @@ app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, 
     const roomNumber = parseInt(req.params.roomNumber);
     try {
         const messages = yield prisma.messagelist.findMany({
-            where: { RoomId: roomNumber },
-            select: { UserMessage: true, AiMessage: true },
+            where: { roomid: roomNumber },
+            select: { usermessage: true, aimessage: true },
         });
         res.status(200).json(messages);
     }
@@ -95,35 +97,36 @@ app.get("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 // 특정 날짜 이전의 todo 조회 api (Prisma 기반)
-// app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
-//     const date = req.query.date;
-//     if (!date) {
-//         res.status(400).json({ error: "Date is required" });
-//         return;
-//     }
-//     try {
-//         const todos = await prisma.todolist.findMany({
-//             where: {
-//                 goal: {
-//                     lt: new Date(date as string), // 문자열 → Date 객체 변환
-//                 },
-//             },
-//         });
-//         if (todos.length === 0) {
-//             res.status(404).json({ error: "No todos found before this date" });
-//             return;
-//         }
-//         res.status(200).json(todos);
-//     } catch (err) {
-//         console.error("Prisma date 조회 실패:", err);
-//         res.status(500).json({ error: "Failed to fetch todos" });
-//     }
-// });
+app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const date = req.query.date;
+    if (!date) {
+        res.status(400).json({ error: "Date is required" });
+        return;
+    }
+    try {
+        const todos = yield prisma.todolist.findMany({
+            where: {
+                goaldate: {
+                    lt: new Date(date),
+                },
+            },
+        });
+        if (todos.length === 0) {
+            res.status(404).json({ error: "No todos found before this date" });
+            return;
+        }
+        res.status(200).json(todos);
+    }
+    catch (err) {
+        console.error("Prisma date 조회 실패:", err);
+        res.status(500).json({ error: "Failed to fetch todos" });
+    }
+}));
 // ✅ 특정 todo 조회
 app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {
-        const todo = yield prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        const todo = yield prisma.todolist.findFirst({ where: { uid: todoUid } });
         if (!todo)
             res.status(404).json({ error: "Todo not found" });
         res.status(200).json(todo);
@@ -137,10 +140,10 @@ app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function*
 app.delete("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {
-        const todo = yield prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        const todo = yield prisma.todolist.findFirst({ where: { uid: todoUid } });
         if (!todo)
             res.status(404).json({ error: "Todo not found" });
-        yield prisma.todolist.delete({ where: { Uid: todo === null || todo === void 0 ? void 0 : todo.Uid } });
+        yield prisma.todolist.delete({ where: { uid: todoUid } });
         res.status(200).json(todo);
     }
     catch (err) {
@@ -163,11 +166,11 @@ app.delete("/alltodos", (_req, res) => __awaiter(void 0, void 0, void 0, functio
 app.patch("/todos/:Uid/toggle", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {
-        const todo = yield prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        const todo = yield prisma.todolist.findFirst({ where: { uid: todoUid } });
         if (!todo)
             res.status(404).json({ error: "Todo not found" });
         const updated = yield prisma.todolist.update({
-            where: { Uid: todo === null || todo === void 0 ? void 0 : todo.Uid },
+            where: { uid: todoUid },
             data: { completed: !(todo === null || todo === void 0 ? void 0 : todo.completed) },
         });
         res.status(200).json(updated);

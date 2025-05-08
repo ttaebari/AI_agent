@@ -15,19 +15,21 @@ app.get("/", (req: Request, res: Response) => {
 
 // todo 생성
 app.post("/todos", async (req: Request, res: Response): Promise<void> => {
-    const { Uid, name, content, completed, goal } = req.body;
+    const { Uid: uid, name, content, completed, goal: goalstring } = req.body;
+    const goal = goalstring ? new Date(goalstring) : new Date();
     if (!name || !content) {
         res.status(400).json({ error: "Invalid todo data" });
+        return;
     }
 
     try {
         const todo = await prisma.todolist.create({
             data: {
-                Uid,
+                uid,
                 name,
                 content,
+                goaldate: goal,
                 completed,
-                goal,
             },
         });
         res.status(201).json({ todo });
@@ -48,9 +50,9 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
         const message = await prisma.messagelist.create({
             data: {
                 name: user,
-                RoomId: roomNumber,
-                UserMessage: user_text,
-                AiMessage: ai_text,
+                roomid: roomNumber,
+                usermessage: user_text,
+                aimessage: ai_text,
             },
         });
         res.status(201).json({ message });
@@ -65,8 +67,8 @@ app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<voi
     const roomNumber = parseInt(req.params.roomNumber);
     try {
         const messages = await prisma.messagelist.findMany({
-            where: { RoomId: roomNumber },
-            select: { UserMessage: true, AiMessage: true },
+            where: { roomid: roomNumber },
+            select: { usermessage: true, aimessage: true },
         });
         res.status(200).json(messages);
     } catch (err) {
@@ -87,40 +89,40 @@ app.get("/todos", async (req: Request, res: Response): Promise<void> => {
 });
 
 // 특정 날짜 이전의 todo 조회 api (Prisma 기반)
-// app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
-//     const date = req.query.date;
+app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
+    const date = req.query.date;
 
-//     if (!date) {
-//         res.status(400).json({ error: "Date is required" });
-//         return;
-//     }
+    if (!date) {
+        res.status(400).json({ error: "Date is required" });
+        return;
+    }
 
-//     try {
-//         const todos = await prisma.todolist.findMany({
-//             where: {
-//                 goal: {
-//                     lt: new Date(date as string), // 문자열 → Date 객체 변환
-//                 },
-//             },
-//         });
+    try {
+        const todos = await prisma.todolist.findMany({
+            where: {
+                goaldate: {
+                    lt: new Date(date as string),
+                },
+            },
+        });
 
-//         if (todos.length === 0) {
-//             res.status(404).json({ error: "No todos found before this date" });
-//             return;
-//         }
+        if (todos.length === 0) {
+            res.status(404).json({ error: "No todos found before this date" });
+            return;
+        }
 
-//         res.status(200).json(todos);
-//     } catch (err) {
-//         console.error("Prisma date 조회 실패:", err);
-//         res.status(500).json({ error: "Failed to fetch todos" });
-//     }
-// });
+        res.status(200).json(todos);
+    } catch (err) {
+        console.error("Prisma date 조회 실패:", err);
+        res.status(500).json({ error: "Failed to fetch todos" });
+    }
+});
 
 // ✅ 특정 todo 조회
 app.get("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = parseInt(req.params.Uid);
     try {
-        const todo = await prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        const todo = await prisma.todolist.findFirst({ where: { uid: todoUid } });
         if (!todo) res.status(404).json({ error: "Todo not found" });
         res.status(200).json(todo);
     } catch (err) {
@@ -134,10 +136,10 @@ app.delete("/todos/:Uid", async (req: Request, res: Response): Promise<void> => 
     const todoUid = parseInt(req.params.Uid);
 
     try {
-        const todo = await prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        const todo = await prisma.todolist.findFirst({ where: { uid: todoUid } });
         if (!todo) res.status(404).json({ error: "Todo not found" });
 
-        await prisma.todolist.delete({ where: { Uid: todo?.Uid } });
+        await prisma.todolist.delete({ where: { uid: todoUid } });
         res.status(200).json(todo);
     } catch (err) {
         console.error("삭제 실패:", err);
@@ -161,11 +163,11 @@ app.patch("/todos/:Uid/toggle", async (req: Request, res: Response): Promise<voi
     const todoUid = parseInt(req.params.Uid);
 
     try {
-        const todo = await prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        const todo = await prisma.todolist.findFirst({ where: { uid: todoUid } });
         if (!todo) res.status(404).json({ error: "Todo not found" });
 
         const updated = await prisma.todolist.update({
-            where: { Uid: todo?.Uid },
+            where: { uid: todoUid },
             data: { completed: !todo?.completed },
         });
 
