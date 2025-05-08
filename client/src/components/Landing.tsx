@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export function Landing() {
     const [todos, setTodos] = useState<
         {
-            uid: number;
+            Uid: number;
             name: string;
             content: string;
             goal: string;
@@ -59,8 +59,8 @@ export function Landing() {
                                 </thead>
                                 <tbody>
                                     {todos.map((todo) => (
-                                        <tr key={todo.uid}>
-                                            <td className="border border-white/20 p-2">{todo.uid}</td>
+                                        <tr key={todo.Uid}>
+                                            <td className="border border-white/20 p-2">{todo.Uid}</td>
                                             <td className="border border-white/20 p-2">{todo.name}</td>
                                             <td className="border border-white/20 p-2">{todo.content}</td>
                                             <td className="border border-white/20 p-2">{todo.goal}까지</td>
