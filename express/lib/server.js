@@ -13,156 +13,183 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const db_1 = require("./db");
 const cors_1 = __importDefault(require("cors"));
+const client_1 = require("@prisma/client");
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)()); // CORS 설정
+app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 const PORT = 3001;
+const prisma = new client_1.PrismaClient();
 app.get("/", (req, res) => {
     res.sendFile("index.html", { root: "./public" });
 });
-//DB 업데이트 api
+// ✅ todo 생성
 app.post("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const todo = req.body;
-    if (!todo || !todo.name || !todo.content) {
+    const { Uid, name, content, completed, goal } = req.body;
+    if (!name || !content) {
         res.status(400).json({ error: "Invalid todo data" });
     }
-    yield db_1.pool.query(`INSERT INTO todolist (Uid, name, content, goal, completed)
-        VALUES ($1, $2, $3, $4, $5)`, [todo.Uid, todo.name, todo.content, todo.goal, todo.completed]);
-    res.status(201).json({ todo });
-}));
-//message 저장
-app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const messages = req.body;
-    if (!messages.user || !messages.roomNumber || !messages.user_text || !messages.Ai_text) {
-        res.status(400).json({ error: "Invalid request data" });
-    }
-    yield db_1.pool.query(`INSERT INTO messagelist (name, RoomId, UserMessage, AiMessage)
-         VALUES ($1, $2, $3 , $4)`, [messages.user, messages.roomNumber, messages.user_text, messages.Ai_text]);
-    res.status(201).json({ message: "Message saved successfully" });
-}));
-//room별 message 조회
-app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomNumber = req.params.roomNumber;
     try {
-        const result = yield db_1.pool.query(`SELECT UserMessage, AiMessage FROM messagelist WHERE RoomId = $1`, [
-            roomNumber,
-        ]);
-        res.status(200).json(result.rows);
+        const todo = yield prisma.todolist.create({
+            data: {
+                Uid,
+                name,
+                content,
+                completed,
+                goal,
+            },
+        });
+        res.status(201).json({ todo });
     }
     catch (err) {
-        console.error("message DB 조회 실패:", err);
+        console.error("Prisma insert error:", err);
+        res.status(500).json({ error: "Failed to create todo" });
+    }
+}));
+// ✅ message 저장
+app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user, roomNumber, user_text, ai_text } = req.body;
+    if (!user || !roomNumber || !user_text || !ai_text) {
+        res.status(400).json({ error: "Invalid request data" });
+    }
+    try {
+        const message = yield prisma.messagelist.create({
+            data: {
+                name: user,
+                RoomId: roomNumber,
+                UserMessage: user_text,
+                AiMessage: ai_text,
+            },
+        });
+        res.status(201).json({ message });
+    }
+    catch (err) {
+        console.error("Prisma insert error:", err);
+        res.status(500).json({ error: "Failed to create message" });
+    }
+}));
+// ✅ room별 message 조회
+app.get("/message/:roomNumber", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const roomNumber = parseInt(req.params.roomNumber);
+    try {
+        const messages = yield prisma.messagelist.findMany({
+            where: { RoomId: roomNumber },
+            select: { UserMessage: true, AiMessage: true },
+        });
+        res.status(200).json(messages);
+    }
+    catch (err) {
+        console.error("message 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch messages" });
     }
 }));
-//DB 조회 api
+// ✅ 전체 todo 조회
 app.get("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield db_1.pool.query("SELECT * FROM todolist");
-        res.status(200).json(result.rows);
+        const todos = yield prisma.todolist.findMany();
+        res.status(200).json(todos);
     }
     catch (err) {
-        console.error("DB 조회 실패:", err);
+        console.error("todo 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch todos" });
     }
 }));
-//특정 날짜 이전의 todo 조회 api
-app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const date = req.query.date;
-    try {
-        const result = yield db_1.pool.query("SELECT * FROM todolist WHERE TO_DATE(goal, 'YYYY-MM-DD') < TO_DATE($1, 'YYYY-MM-DD')", [date]);
-        if (result.rows.length === 0) {
-            res.status(404).json({ error: "No todos found before this date" });
-        }
-        res.status(200).json(result.rows);
-    }
-    catch (err) {
-        console.error("date DB 조회 실패:", err);
-        res.status(500).json({ error: "Failed to fetch todos" });
-    }
-}));
-//특정 todo 조회 api
+// //특정 날짜 이전의 todo 조회 api (Prisma 기반)
+// app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
+//     const date = req.query.date;
+//     if (!date) {
+//         res.status(400).json({ error: "Date is required" });
+//         return;
+//     }
+//     try {
+//         const todos = await prisma.todolist.findMany({
+//             where: {
+//                 goal: {
+//                     lt: new Date(date as string), // 문자열 → Date 객체 변환
+//                 },
+//             },
+//         });
+//         if (todos.length === 0) {
+//             res.status(404).json({ error: "No todos found before this date" });
+//             return;
+//         }
+//         res.status(200).json(todos);
+//     } catch (err) {
+//         console.error("Prisma date 조회 실패:", err);
+//         res.status(500).json({ error: "Failed to fetch todos" });
+//     }
+// });
+// ✅ 특정 todo 조회
 app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const todoUid = req.params.Uid;
+    const todoUid = parseInt(req.params.Uid);
     try {
-        const result = yield db_1.pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);
-        if (result.rows.length === 0) {
+        const todo = yield prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        if (!todo)
             res.status(404).json({ error: "Todo not found" });
-        }
-        res.status(200).json(result.rows[0]);
+        res.status(200).json(todo);
     }
     catch (err) {
-        console.error("Uid DB 조회 실패:", err);
+        console.error("Uid 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch todo" });
     }
 }));
-//특정 todo 삭제 api
+// ✅ 특정 todo 삭제
 app.delete("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const todoUid = req.params.Uid;
+    const todoUid = parseInt(req.params.Uid);
     try {
-        const row = yield db_1.pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);
-        const result = yield db_1.pool.query("DELETE FROM todolist WHERE Uid = $1", [todoUid]);
-        if (result.rowCount === 0) {
+        const todo = yield prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        if (!todo)
             res.status(404).json({ error: "Todo not found" });
-        }
-        res.status(200).json(row.rows[0]);
+        yield prisma.todolist.delete({ where: { Uid: todo === null || todo === void 0 ? void 0 : todo.Uid } });
+        res.status(200).json(todo);
     }
     catch (err) {
-        console.error("DB 삭제 실패:", err);
+        console.error("삭제 실패:", err);
         res.status(500).json({ error: "Failed to delete todo" });
     }
 }));
-app.delete("/alltodos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// ✅ 모든 todo 삭제
+app.delete("/alltodos", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield db_1.pool.query("TRUNCATE TABLE todolist");
+        yield prisma.todolist.deleteMany();
         res.status(200).json({ message: "All todos deleted successfully" });
     }
     catch (err) {
-        console.error("DB 삭제 실패:", err);
+        console.error("모두 삭제 실패:", err);
         res.status(500).json({ error: "Failed to delete all todos" });
     }
 }));
-//todo 완료여부 수정 api
+// ✅ 완료 여부 토글
 app.patch("/todos/:Uid/toggle", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const todoUid = req.params.Uid;
+    const todoUid = parseInt(req.params.Uid);
     try {
-        const row = yield db_1.pool.query("SELECT * FROM todolist WHERE Uid = $1", [todoUid]);
-        if (row.rowCount === 0) {
+        const todo = yield prisma.todolist.findFirst({ where: { Uid: todoUid } });
+        if (!todo)
             res.status(404).json({ error: "Todo not found" });
-        }
-        const result = yield db_1.pool.query("UPDATE todolist SET completed = NOT completed WHERE Uid = $1", [todoUid]);
-        if (result.rowCount === 0) {
-            res.status(500).json({ error: "Todo update failed" });
-        }
-        res.status(200).json({
-            Uid: row.rows[0].Uid,
-            name: row.rows[0].name,
-            content: row.rows[0].content,
-            goal: row.rows[0].goal,
-            completed: !row.rows[0].completed,
+        const updated = yield prisma.todolist.update({
+            where: { Uid: todo === null || todo === void 0 ? void 0 : todo.Uid },
+            data: { completed: !(todo === null || todo === void 0 ? void 0 : todo.completed) },
         });
+        res.status(200).json(updated);
     }
     catch (err) {
-        console.error("DB 업데이트 실패:", err);
+        console.error("업데이트 실패:", err);
         res.status(500).json({ error: "Failed to update todo" });
     }
 }));
-//todo 미완료 목록 조회 api
-app.get("/todos/report", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// ✅ 미완료 목록 조회
+app.get("/todos/report", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield db_1.pool.query("SELECT * FROM todolist where completed = FALSE");
-        if (result.rows.length === 0) {
+        const todos = yield prisma.todolist.findMany({ where: { completed: false } });
+        if (todos.length === 0)
             res.status(404).json({ error: "No todos found" });
-        }
-        res.status(200).json(result.rows);
+        res.status(200).json(todos);
     }
     catch (err) {
-        console.error("DB 조회 실패:", err);
+        console.error("조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch todos" });
     }
 }));
-// 서버 실행
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

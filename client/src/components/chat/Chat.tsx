@@ -23,7 +23,7 @@ export function Chat({
         }
     };
 
-    const [messageHistory, setMessageHistory] = useState<{ usermessage: string; aimessage: string }[]>([]);
+    const [messageHistory, setMessageHistory] = useState<{ UserMessage: string; AiMessage: string }[]>([]);
     const Server_URL = "http://localhost:3001";
     useEffect(() => {
         async function fetchMessages() {
@@ -35,6 +35,7 @@ export function Chat({
                     },
                 });
                 const messages = await res.json();
+                console.log("Fetched messages:", messages);
                 if (!res.ok) {
                     throw new Error("Failed to fetch messages");
                 }

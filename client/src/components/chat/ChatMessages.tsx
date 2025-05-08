@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 interface ChatMessagesProps {
     messages: IAgenticaEventJson[];
-    messageHistory: { usermessage: string; aimessage: string }[];
+    messageHistory: { UserMessage: string; AiMessage: string }[];
     roomNumber: number;
 }
 
@@ -18,9 +18,10 @@ export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessa
 
     useEffect(() => {
         if (messages.length > 0 && messages.length % 2 === 0) {
-            const UserMessage = messages[messages.length - 1];
+            console.log(messages);
+            const UserMessage = messages[messages.length - 2];
             UserMessage.type === "text" ? (user_text = UserMessage.text) : (user_text = "");
-            const AiMessage = messages[messages.length - 2];
+            const AiMessage = messages[messages.length - 1];
             AiMessage.type === "text" || AiMessage.type === "describe" ? (ai_text = AiMessage.text) : (ai_text = "");
         }
 
@@ -35,7 +36,7 @@ export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessa
                         user: "taeho",
                         roomNumber: roomNumber,
                         user_text: user_text,
-                        Ai_text: ai_text,
+                        ai_text: ai_text,
                     }),
                 });
                 if (!res.ok) {
@@ -46,6 +47,8 @@ export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessa
             }
         };
         if (user_text.length > 0 && ai_text.length > 0) {
+            console.log("user_text", user_text);
+            console.log("ai_text", ai_text);
             sendMessage();
         }
     }, [messages]);
