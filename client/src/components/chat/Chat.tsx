@@ -4,7 +4,7 @@ import { ChatMessages } from "./ChatMessages";
 import { ChatStatus } from "./ChatStatus";
 import { useEffect, useRef, useState } from "react";
 
-export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid: number) => void }) {
+export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomid: (roomid: number) => void }) {
     const { messages, conversate, isConnected, isError, tryConnect } = useAgenticaRpc();
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const hasMessage = messages.length > 0;
@@ -34,7 +34,7 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
     const addRoom = () => {
         const newId = rooms.length > 0 ? Math.max(...rooms.map((r) => r.id)) + 1 : 1;
         setRooms((prev) => [...prev, { id: newId, name: `Room ${newId}` }]);
-        setRoomid(newId);
+        onChangeRoomid(newId);
     };
 
     //룸 삭제
@@ -43,7 +43,7 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
         const updated = rooms.filter((room) => room.id !== id);
         setRooms(updated);
         if (roomid === id) {
-            setRoomid(updated[0].id);
+            onChangeRoomid(updated[0].id);
         }
     };
 
@@ -83,7 +83,7 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
                     {rooms.map((room) => (
                         <div key={room.id} className="relative">
                             <button
-                                onClick={() => setRoomid(room.id)}
+                                onClick={() => onChangeRoomid(room.id)}
                                 className={`text-sm px-5 py-2 rounded-md border min-w-[100px] relative ${
                                     roomid === room.id ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
                                 }`}

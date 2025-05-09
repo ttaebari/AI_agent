@@ -21,7 +21,7 @@ const App = () => {
                     <LandingPageWrapper />
                 </div>
                 <AgenticaRpcProvider users={user} roomid={roomid}>
-                    <Chat roomid={roomid} setRoomid={handleChangeRoomid} />
+                    <Chat roomid={roomid} onChangeRoomid={handleChangeRoomid} />
                 </AgenticaRpcProvider>
             </div>
         </div>
