@@ -39,11 +39,7 @@ export function ChatStatus({ isError, isConnected, hasMessages, onRetryConnect, 
     }
 
     if (!hasMessages) {
-        return (
-            <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-                Start a conversation by sending a message...
-            </div>
-        );
+        return <div className="h-full flex items-center justify-center text-gray-400 text-sm"></div>;
     }
 
     return null;

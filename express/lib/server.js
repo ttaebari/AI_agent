@@ -48,7 +48,7 @@ app.post("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ error: "Failed to create todo" });
     }
 }));
-// message 저장
+// *message 저장
 app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { users, roomid, type, role, text } = req.body;
     if (!users || !roomid || !type || !text) {
@@ -87,7 +87,7 @@ app.get("/message/:roomid", (req, res) => __awaiter(void 0, void 0, void 0, func
         res.status(500).json({ error: "Failed to fetch messages" });
     }
 }));
-// 전체 todo 조회
+// *전체 todo 조회
 app.get("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const todos = yield prisma.todolist.findMany();
@@ -98,7 +98,7 @@ app.get("/todos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ error: "Failed to fetch todos" });
     }
 }));
-// 특정 날짜 이전의 todo 조회 api (Prisma 기반)
+// *특정 날짜 이전의 todo 조회 api (Prisma 기반)
 app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const date = req.query.date;
     if (!date) {
@@ -124,7 +124,7 @@ app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).json({ error: "Failed to fetch todos" });
     }
 }));
-// 특정 todo 조회
+// *특정 todo 조회
 app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {
@@ -138,7 +138,7 @@ app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(500).json({ error: "Failed to fetch todo" });
     }
 }));
-// 특정 todo 삭제
+// *특정 todo 삭제
 app.delete("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {
@@ -153,7 +153,7 @@ app.delete("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ error: "Failed to delete todo" });
     }
 }));
-// 모든 todo 삭제
+// *모든 todo 삭제
 app.delete("/alltodos", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield prisma.todolist.deleteMany();
@@ -164,7 +164,7 @@ app.delete("/alltodos", (_req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).json({ error: "Failed to delete all todos" });
     }
 }));
-// 완료 여부 토글
+// *완료 여부 토글
 app.patch("/todos/:Uid/toggle", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {
@@ -182,7 +182,7 @@ app.patch("/todos/:Uid/toggle", (req, res) => __awaiter(void 0, void 0, void 0, 
         res.status(500).json({ error: "Failed to update todo" });
     }
 }));
-// 미완료 목록 조회
+// *미완료 목록 조회
 app.get("/todos/report", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const todos = yield prisma.todolist.findMany({ where: { completed: false } });
@@ -195,7 +195,7 @@ app.get("/todos/report", (_req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ error: "Failed to fetch todos" });
     }
 }));
-//서버 실행
+//*서버 실행
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
