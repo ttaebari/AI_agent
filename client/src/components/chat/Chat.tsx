@@ -4,13 +4,7 @@ import { ChatMessages } from "./ChatMessages";
 import { ChatStatus } from "./ChatStatus";
 import { useEffect, useRef, useState } from "react";
 
-export function Chat({
-    roomNumber,
-    setRoomNumber,
-}: {
-    roomNumber: number;
-    setRoomNumber: (roomNumber: number) => void;
-}) {
+export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid: number) => void }) {
     const { messages, conversate, isConnected, isError, tryConnect } = useAgenticaRpc();
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const hasMessage = messages.length > 0;
@@ -23,12 +17,12 @@ export function Chat({
         }
     };
 
-    const [messageHistory, setMessageHistory] = useState<{ usermessage: string; aimessage: string }[]>([]);
+    const [messageHistory, setMessageHistory] = useState<{ role: string; text: string }[]>([]);
     const Server_URL = "http://localhost:3001";
     useEffect(() => {
         async function fetchMessages() {
             try {
-                const res = await fetch(`${Server_URL}/message/${roomNumber}`, {
+                const res = await fetch(`${Server_URL}/message/${roomid}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -45,10 +39,10 @@ export function Chat({
                 setMessageHistory([]);
             }
         }
-        if (roomNumber) {
+        if (roomid) {
             fetchMessages();
         }
-    }, [roomNumber]);
+    }, [roomid]);
 
     useEffect(() => {
         scrollToBottom();
@@ -67,20 +61,20 @@ export function Chat({
             <div className="absolute top-4 left-4 flex gap-2 z-10">
                 <button
                     onClick={() => {
-                        setRoomNumber(1);
+                        setRoomid(1);
                     }}
                     className={`text-sm px-3 py-1 rounded-md border ${
-                        roomNumber === 1 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
+                        roomid === 1 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
                     }`}
                 >
                     Room 1
                 </button>
                 <button
                     onClick={() => {
-                        setRoomNumber(2);
+                        setRoomid(2);
                     }}
                     className={`text-sm px-3 py-1 rounded-md border ${
-                        roomNumber === 2 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
+                        roomid === 2 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
                     }`}
                 >
                     Room 2
@@ -90,7 +84,7 @@ export function Chat({
             <div className="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
                 <div className="h-full flex flex-col bg-zinc-800/50 backdrop-blur-md rounded-2xl overflow-hidden border border-zinc-700/30">
                     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
-                        <ChatMessages messages={messages} messageHistory={messageHistory} roomNumber={roomNumber} />
+                        <ChatMessages messages={messages} messageHistory={messageHistory} roomid={roomid} />
                         <ChatStatus
                             isError={isError}
                             isConnected={isConnected}

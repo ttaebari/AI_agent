@@ -4,10 +4,10 @@ import { AgenticaRpcProvider } from "./provider/AgenticaRpcProvider";
 import { useState } from "react";
 
 const App = () => {
-    const [roomNumber, setRoomNumber] = useState(1);
+    const [roomid, setRoomid] = useState(1);
     const user = "taeho";
-    const handleChangeRoomnumber = (roomNumber: number) => {
-        setRoomNumber(roomNumber);
+    const handleChangeRoomid = (roomid: number) => {
+        setRoomid(roomid);
     };
     return (
         <div className="relative min-h-screen">
@@ -20,8 +20,8 @@ const App = () => {
                 <div className="hidden lg:flex md:flex-1">
                     <LandingPageWrapper />
                 </div>
-                <AgenticaRpcProvider user={user} roomNumber={roomNumber}>
-                    <Chat roomNumber={roomNumber} setRoomNumber={handleChangeRoomnumber} />
+                <AgenticaRpcProvider users={user} roomid={roomid}>
+                    <Chat roomid={roomid} setRoomid={handleChangeRoomid} />
                 </AgenticaRpcProvider>
             </div>
         </div>

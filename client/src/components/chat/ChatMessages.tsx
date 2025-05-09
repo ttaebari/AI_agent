@@ -5,27 +5,21 @@ import { useEffect } from "react";
 
 interface ChatMessagesProps {
     messages: IAgenticaEventJson[];
-    messageHistory: { usermessage: string; aimessage: string }[];
-    roomNumber: number;
+    messageHistory: { role: string; text: string }[];
+    roomid: number;
 }
 
-export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessagesProps) {
+export function ChatMessages({ messages, messageHistory, roomid }: ChatMessagesProps) {
     const Server_URL = "http://localhost:3001";
     console.log("messages", messages);
 
-    let user_text = "";
-    let ai_text = "";
-
     useEffect(() => {
-        if (messages.length > 0 && messages.length % 2 === 0) {
-            console.log(messages);
-            const UserMessage = messages[messages.length - 2];
-            UserMessage.type === "text" ? (user_text = UserMessage.text) : (user_text = "");
-            const AiMessage = messages[messages.length - 1];
-            AiMessage.type === "text" || AiMessage.type === "describe" ? (ai_text = AiMessage.text) : (ai_text = "");
-        }
-
         const sendMessage = async () => {
+            const Message = messages[messages.length - 1];
+            const role = Message.type === "text" ? Message.role : "assistant";
+            const type = Message.type;
+            const text = Message.type === "text" || Message.type === "describe" ? Message.text : "";
+
             try {
                 const res = await fetch(`${Server_URL}/message`, {
                     method: "POST",
@@ -33,10 +27,11 @@ export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessa
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        user: "taeho",
-                        roomNumber: roomNumber,
-                        user_text: user_text,
-                        ai_text: ai_text,
+                        users: "taeho",
+                        roomid,
+                        type,
+                        role,
+                        text,
                     }),
                 });
                 if (!res.ok) {
@@ -46,24 +41,14 @@ export function ChatMessages({ messages, messageHistory, roomNumber }: ChatMessa
                 console.error("Error sending message to server:", error);
             }
         };
-        if (user_text.length > 0 && ai_text.length > 0) {
-            console.log("user_text", user_text);
-            console.log("ai_text", ai_text);
+        if (messages) {
             sendMessage();
         }
     }, [messages]);
 
     return (
         <>
-            <ChatMessageHistory
-                key={0}
-                message={{
-                    id: "0",
-                    role: "assistant",
-                    content: "",
-                }}
-                messageHistory={messageHistory}
-            />
+            <ChatMessageHistory messageHistory={messageHistory} />
             {messages.map((message, index) => (
                 <ChatMessage
                     key={index}

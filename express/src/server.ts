@@ -41,18 +41,19 @@ app.post("/todos", async (req: Request, res: Response): Promise<void> => {
 
 // message 저장
 app.post("/message", async (req: Request, res: Response): Promise<void> => {
-    const { user, roomNumber, user_text, ai_text } = req.body;
-    if (!user || !roomNumber || !user_text || !ai_text) {
+    const { users, roomid, type, role, text } = req.body;
+    if (!users || !roomid || !type || !text) {
         res.status(400).json({ error: "Invalid request data" });
     }
 
     try {
         const message = await prisma.messagelist.create({
             data: {
-                name: user,
-                roomid: roomNumber,
-                usermessage: user_text,
-                aimessage: ai_text,
+                users,
+                roomid,
+                type,
+                role,
+                text,
             },
         });
         res.status(201).json({ message });
@@ -63,12 +64,13 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
 });
 
 // room별 message 조회
-app.get("/message/:roomNumber", async (req: Request, res: Response): Promise<void> => {
-    const roomNumber = parseInt(req.params.roomNumber);
+app.get("/message/:roomid", async (req: Request, res: Response): Promise<void> => {
+    const roomid = parseInt(req.params.roomid);
     try {
         const messages = await prisma.messagelist.findMany({
-            where: { roomid: roomNumber },
-            select: { usermessage: true, aimessage: true },
+            where: { roomid: roomid },
+            select: { role: true, text: true },
+            orderBy: { id: "asc" },
         });
         res.status(200).json(messages);
     } catch (err) {

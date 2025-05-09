@@ -8,9 +8,9 @@ const AgenticaRpcContext = createContext<AgenticaRpcContextType | null>(null);
 
 export function AgenticaRpcProvider({
     children,
-    user = "taeho",
-    roomNumber = 1,
-}: PropsWithChildren<{ user?: string; roomNumber?: number }>) {
+    users = "taeho",
+    roomid = 1,
+}: PropsWithChildren<{ users?: string; roomid?: number }>) {
     const [messages, setMessages] = useState<IAgenticaEventJson[]>([]);
     const [isError, setIsError] = useState(false);
     const [driver, setDriver] = useState<Driver<IAgenticaRpcService<"chatgpt">, false> | null>(null);
@@ -25,11 +25,11 @@ export function AgenticaRpcProvider({
         try {
             setIsError(false);
             const conn = new WebSocketConnector<
-                { user: string; roomNumber: number },
+                { users: string; roomid: number },
                 IAgenticaRpcListener,
                 IAgenticaRpcService<"chatgpt">
             >(
-                { user, roomNumber },
+                { users, roomid },
                 {
                     describe: pushMessage,
                     text: pushMessage,
@@ -71,7 +71,7 @@ export function AgenticaRpcProvider({
             setIsError(true);
             return undefined;
         }
-    }, [user, roomNumber, pushMessage]);
+    }, [users, roomid, pushMessage]);
 
     const conversate = useCallback(
         async (message: string) => {
@@ -102,7 +102,7 @@ export function AgenticaRpcProvider({
 
             tryConnect();
         })();
-    }, [roomNumber]);
+    }, [roomid]);
 
     return (
         <AgenticaRpcContext.Provider value={{ messages, conversate, isConnected, isError, tryConnect }}>
