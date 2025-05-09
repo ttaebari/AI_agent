@@ -124,7 +124,7 @@ app.get("/todos/filter", (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).json({ error: "Failed to fetch todos" });
     }
 }));
-// ✅ 특정 todo 조회
+// 특정 todo 조회
 app.get("/todos/:Uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todoUid = parseInt(req.params.Uid);
     try {

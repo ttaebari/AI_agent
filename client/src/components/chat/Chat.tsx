@@ -11,30 +11,45 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
     const lastMessage = messages[messages.length - 1];
     const isLastMessageFromUser = lastMessage?.type === "text" && lastMessage?.role === "user";
 
+    const [rooms, setRooms] = useState<{ id: number; name: string }[]>([{ id: 1, name: "Room 1" }]);
+    const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
+    const [messageHistory, setMessageHistory] = useState<{ role: string; text: string }[]>([]);
+    const Server_URL = "http://localhost:3001";
+
     const scrollToBottom = () => {
         if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
     };
-    const [rooms, setRooms] = useState<number[]>([1]);
-    const [messageHistory, setMessageHistory] = useState<{ role: string; text: string }[]>([]);
-    const Server_URL = "http://localhost:3001";
 
-    // 룸 추가
-    const addRoom = () => {
-        const newRoomId = Math.max(...rooms) + 1;
-        setRooms((prev) => [...prev, newRoomId]);
-        setRoomid(newRoomId);
+    const handleSendMessage = async (content: string) => {
+        try {
+            await conversate(content);
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        }
     };
 
-    // 룸 삭제
+    //룸 추가
+    const addRoom = () => {
+        const newId = rooms.length > 0 ? Math.max(...rooms.map((r) => r.id)) + 1 : 1;
+        setRooms((prev) => [...prev, { id: newId, name: `Room ${newId}` }]);
+        setRoomid(newId);
+    };
+
+    //룸 삭제
     const removeRoom = (id: number) => {
-        if (rooms.length === 1) return; // 최소 1개는 유지
-        const updatedRooms = rooms.filter((room) => room !== id);
-        setRooms(updatedRooms);
+        if (rooms.length === 1) return;
+        const updated = rooms.filter((room) => room.id !== id);
+        setRooms(updated);
         if (roomid === id) {
-            setRoomid(updatedRooms[0]); // 삭제된 룸이 현재 룸이면 다른 룸으로 이동
+            setRoomid(updated[0].id);
         }
+    };
+
+    //룸 이름 변경
+    const renameRoom = (id: number, name: string) => {
+        setRooms((prev) => prev.map((room) => (room.id === id ? { ...room, name } : room)));
     };
 
     useEffect(() => {
@@ -61,41 +76,52 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
         scrollToBottom();
     }, [messages]);
 
-    const handleSendMessage = async (content: string) => {
-        try {
-            await conversate(content);
-        } catch (error) {
-            console.error("Failed to send message:", error);
-        }
-    };
-
     return (
         <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 min-w-0 relative">
-            <div className="absolute top-4 left-4 flex gap-2 z-10 items-center">
-                {rooms.map((id) => (
-                    <div key={id} className="relative">
-                        <button
-                            onClick={() => setRoomid(id)}
-                            className={`text-sm px-4 py-2 rounded-md border min-w-[80-px] relative ${
-                                roomid === id ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
-                            }`}
-                        >
-                            Room {id}
-                        </button>
-                        <button
-                            onClick={() => removeRoom(id)}
-                            className="absolute -top-2 -right-2 bg-white text-black text-xs w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-700"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                ))}
-                <button
-                    onClick={addRoom}
-                    className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md"
-                >
-                    + Add Room
-                </button>
+            <div className="absolute top-4 left-4 right-4 flex gap-2 z-10 items-center">
+                <div className="flex gap-2 flex-wrap">
+                    {rooms.map((room) => (
+                        <div key={room.id} className="relative">
+                            <button
+                                onClick={() => setRoomid(room.id)}
+                                className={`text-sm px-5 py-2 rounded-md border min-w-[100px] relative ${
+                                    roomid === room.id ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
+                                }`}
+                            >
+                                {editingRoomId === room.id ? (
+                                    <input
+                                        type="text"
+                                        value={room.name}
+                                        className="bg-transparent outline-none w-full text-sm text-center"
+                                        autoFocus
+                                        onChange={(e) => renameRoom(room.id, e.target.value)}
+                                        onBlur={() => setEditingRoomId(null)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") setEditingRoomId(null);
+                                        }}
+                                    />
+                                ) : (
+                                    <span onDoubleClick={() => setEditingRoomId(room.id)}>{room.name}</span>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => removeRoom(room.id)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-700"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="ml-auto">
+                    <button
+                        onClick={addRoom}
+                        className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md"
+                    >
+                        + Add Room
+                    </button>
+                </div>
             </div>
 
             <div className="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">

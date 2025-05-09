@@ -39,7 +39,7 @@ app.post("/todos", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// message 저장
+// *message 저장
 app.post("/message", async (req: Request, res: Response): Promise<void> => {
     const { users, roomid, type, role, text } = req.body;
     if (!users || !roomid || !type || !text) {
@@ -79,7 +79,7 @@ app.get("/message/:roomid", async (req: Request, res: Response): Promise<void> =
     }
 });
 
-// 전체 todo 조회
+// *전체 todo 조회
 app.get("/todos", async (req: Request, res: Response): Promise<void> => {
     try {
         const todos = await prisma.todolist.findMany();
@@ -90,7 +90,7 @@ app.get("/todos", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// 특정 날짜 이전의 todo 조회 api (Prisma 기반)
+// *특정 날짜 이전의 todo 조회 api (Prisma 기반)
 app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
     const date = req.query.date;
 
@@ -120,7 +120,7 @@ app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// 특정 todo 조회
+// *특정 todo 조회
 app.get("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = parseInt(req.params.Uid);
     try {
@@ -133,7 +133,7 @@ app.get("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// 특정 todo 삭제
+// *특정 todo 삭제
 app.delete("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = parseInt(req.params.Uid);
 
@@ -149,7 +149,7 @@ app.delete("/todos/:Uid", async (req: Request, res: Response): Promise<void> => 
     }
 });
 
-// 모든 todo 삭제
+// *모든 todo 삭제
 app.delete("/alltodos", async (_req: Request, res: Response): Promise<void> => {
     try {
         await prisma.todolist.deleteMany();
@@ -160,7 +160,7 @@ app.delete("/alltodos", async (_req: Request, res: Response): Promise<void> => {
     }
 });
 
-// 완료 여부 토글
+// *완료 여부 토글
 app.patch("/todos/:Uid/toggle", async (req: Request, res: Response): Promise<void> => {
     const todoUid = parseInt(req.params.Uid);
 
@@ -180,7 +180,7 @@ app.patch("/todos/:Uid/toggle", async (req: Request, res: Response): Promise<voi
     }
 });
 
-// 미완료 목록 조회
+// *미완료 목록 조회
 app.get("/todos/report", async (_req: Request, res: Response): Promise<void> => {
     try {
         const todos = await prisma.todolist.findMany({ where: { completed: false } });
@@ -192,7 +192,7 @@ app.get("/todos/report", async (_req: Request, res: Response): Promise<void> => 
     }
 });
 
-//서버 실행
+//*서버 실행
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
