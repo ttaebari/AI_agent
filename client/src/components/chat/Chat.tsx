@@ -16,9 +16,27 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
     };
-
+    const [rooms, setRooms] = useState<number[]>([1]);
     const [messageHistory, setMessageHistory] = useState<{ role: string; text: string }[]>([]);
     const Server_URL = "http://localhost:3001";
+
+    // 룸 추가
+    const addRoom = () => {
+        const newRoomId = Math.max(...rooms) + 1;
+        setRooms((prev) => [...prev, newRoomId]);
+        setRoomid(newRoomId);
+    };
+
+    // 룸 삭제
+    const removeRoom = (id: number) => {
+        if (rooms.length === 1) return; // 최소 1개는 유지
+        const updatedRooms = rooms.filter((room) => room !== id);
+        setRooms(updatedRooms);
+        if (roomid === id) {
+            setRoomid(updatedRooms[0]); // 삭제된 룸이 현재 룸이면 다른 룸으로 이동
+        }
+    };
+
     useEffect(() => {
         async function fetchMessages() {
             try {
@@ -29,19 +47,14 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
                     },
                 });
                 const messages = await res.json();
-                console.log("Fetched messages:", messages);
-                if (!res.ok) {
-                    throw new Error("Failed to fetch messages");
-                }
+                if (!res.ok) throw new Error("Failed to fetch messages");
                 setMessageHistory(messages);
             } catch (error) {
                 console.error("Error fetching messages:", error);
                 setMessageHistory([]);
             }
         }
-        if (roomid) {
-            fetchMessages();
-        }
+        if (roomid) fetchMessages();
     }, [roomid]);
 
     useEffect(() => {
@@ -58,26 +71,30 @@ export function Chat({ roomid, setRoomid }: { roomid: number; setRoomid: (roomid
 
     return (
         <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 min-w-0 relative">
-            <div className="absolute top-4 left-4 flex gap-2 z-10">
+            <div className="absolute top-4 left-4 flex gap-2 z-10 items-center">
+                {rooms.map((id) => (
+                    <div key={id} className="relative">
+                        <button
+                            onClick={() => setRoomid(id)}
+                            className={`text-sm px-4 py-2 rounded-md border min-w-[80-px] relative ${
+                                roomid === id ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
+                            }`}
+                        >
+                            Room {id}
+                        </button>
+                        <button
+                            onClick={() => removeRoom(id)}
+                            className="absolute -top-2 -right-2 bg-white text-black text-xs w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-700"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                ))}
                 <button
-                    onClick={() => {
-                        setRoomid(1);
-                    }}
-                    className={`text-sm px-3 py-1 rounded-md border ${
-                        roomid === 1 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
-                    }`}
+                    onClick={addRoom}
+                    className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md"
                 >
-                    Room 1
-                </button>
-                <button
-                    onClick={() => {
-                        setRoomid(2);
-                    }}
-                    className={`text-sm px-3 py-1 rounded-md border ${
-                        roomid === 2 ? "bg-blue-600 text-white" : "bg-zinc-200 text-black"
-                    }`}
-                >
-                    Room 2
+                    + Add Room
                 </button>
             </div>
 

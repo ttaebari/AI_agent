@@ -120,7 +120,7 @@ app.get("/todos/filter", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// ✅ 특정 todo 조회
+// 특정 todo 조회
 app.get("/todos/:Uid", async (req: Request, res: Response): Promise<void> => {
     const todoUid = parseInt(req.params.Uid);
     try {
