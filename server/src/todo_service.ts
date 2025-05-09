@@ -144,7 +144,7 @@ export class TodoService {
    * @param props - Object containing Todo that name does to remove
    * @throws Error if the Todo is not found
    */
-  public async remove(props: RemoveTodoPayload): Promise<void> {
+  public async remove(props: RemoveTodoPayload): Promise<ITodo> {
     const Uid = props.Uid;
     const response = await fetch(`${TodoService.server_url}/todos/${Uid}`, {
       method: "DELETE",
@@ -156,13 +156,15 @@ export class TodoService {
     if (!response.ok) {
       throw new Error("Failed to remove Todo from server");
     }
+    const result = (await response.json()) as ITodo;
+    return result;
   }
 
   /**
    * remove all Todo items.
    * @throws Error if the Todo is not found
    */
-  public async removeAll(): Promise<void> {
+  public async removeAll(): Promise<ITodo[]> {
     const response = await fetch(`${TodoService.server_url}/alltodos`, {
       method: "DELETE",
       headers: {
@@ -172,6 +174,8 @@ export class TodoService {
     if (!response.ok) {
       throw new Error("Failed to remove all Todos from server");
     }
+    const result = (await response.json()) as ITodo[];
+    return result;
   }
 
   /**
