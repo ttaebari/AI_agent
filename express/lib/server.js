@@ -71,7 +71,7 @@ app.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(500).json({ error: "Failed to create message" });
     }
 }));
-// room별 message 조회
+// *room별 message 조회
 app.get("/message/:roomid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomid = parseInt(req.params.roomid);
     try {
@@ -85,6 +85,16 @@ app.get("/message/:roomid", (req, res) => __awaiter(void 0, void 0, void 0, func
     catch (err) {
         console.error("message 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch messages" });
+    }
+}));
+// *room별 message 삭제
+app.delete("/message/:roomid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const roomid = parseInt(req.params.roomid);
+    try {
+        yield prisma.messagelist.deleteMany({ where: { roomid: roomid } });
+    }
+    catch (err) {
+        res.status(500).json({ error: "Failed to delete messages" });
     }
 }));
 // *전체 todo 조회

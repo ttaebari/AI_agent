@@ -13,6 +13,7 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
 
     const [rooms, setRooms] = useState<{ id: number; name: string }[]>([{ id: 1, name: "Room 1" }]);
     const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
+    const [previousRoomNames, setPreviousRoomNames] = useState<Record<number, string>>({});
     const [messageHistory, setMessageHistory] = useState<{ role: string; text: string }[]>([]);
     const Server_URL = "http://localhost:3001";
 
@@ -50,6 +51,21 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
     //룸 이름 변경
     const renameRoom = (id: number, name: string) => {
         setRooms((prev) => prev.map((room) => (room.id === id ? { ...room, name } : room)));
+    };
+
+    const handleFinishEditing = (roomId: number, currentName: string) => {
+        if (!currentName.trim()) {
+            const previousName = previousRoomNames[roomId];
+            if (previousName) {
+                renameRoom(roomId, previousName);
+            }
+        }
+        setEditingRoomId(null);
+        setPreviousRoomNames((prev) => {
+            const updated = { ...prev };
+            delete updated[roomId];
+            return updated;
+        });
     };
 
     useEffect(() => {
@@ -95,13 +111,23 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
                                         className="bg-transparent outline-none w-full text-sm text-center"
                                         autoFocus
                                         onChange={(e) => renameRoom(room.id, e.target.value)}
-                                        onBlur={() => setEditingRoomId(null)}
+                                        onBlur={() => handleFinishEditing(room.id, room.name)}
                                         onKeyDown={(e) => {
-                                            if (e.key === "Enter") setEditingRoomId(null);
+                                            if (e.key === "Enter") handleFinishEditing(room.id, room.name);
                                         }}
                                     />
                                 ) : (
-                                    <span onDoubleClick={() => setEditingRoomId(room.id)}>{room.name}</span>
+                                    <span
+                                        onDoubleClick={() => {
+                                            setEditingRoomId(room.id);
+                                            setPreviousRoomNames((prev) => ({
+                                                ...prev,
+                                                [room.id]: room.name,
+                                            }));
+                                        }}
+                                    >
+                                        {room.name}
+                                    </span>
                                 )}
                             </button>
                             <button

@@ -63,7 +63,7 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// room별 message 조회
+// *room별 message 조회
 app.get("/message/:roomid", async (req: Request, res: Response): Promise<void> => {
     const roomid = parseInt(req.params.roomid);
     try {
@@ -76,6 +76,16 @@ app.get("/message/:roomid", async (req: Request, res: Response): Promise<void> =
     } catch (err) {
         console.error("message 조회 실패:", err);
         res.status(500).json({ error: "Failed to fetch messages" });
+    }
+});
+
+// *room별 message 삭제
+app.delete("/message/:roomid", async (req: Request, res: Response): Promise<void> => {
+    const roomid = parseInt(req.params.roomid);
+    try {
+        await prisma.messagelist.deleteMany({ where: { roomid: roomid } });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to delete messages" });
     }
 });
 
