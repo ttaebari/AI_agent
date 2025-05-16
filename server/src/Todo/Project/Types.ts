@@ -1,348 +1,221 @@
-/**
- * 프로젝트의 응답 정보 형식
- */
-export interface ProjectResponse {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 프로젝트의 생성 날짜 */
-  createdAt: string;
-  /** 프로젝트의 수정 날짜 */
-  updatedAt?: string;
-  /** 프로젝트의 이름 */
-  name: string;
-  /** 프로젝트의 설명 */
-  description?: string;
-  /** 프로젝트의 공개 여부 */
-  isPublic: boolean;
-  /** 프로젝트의 완료 여부 */
-  completed: boolean;
-  /** 프로젝트의 시작 날짜 */
-  startDate: string;
-  /** 프로젝트의 종료 날짜 */
-  endDate?: string;
-  /** 프로젝트의 생성자 */
-  creator?: UserSimpleResponse;
-}
-
-/**
- * 프로젝트의 멤버 응답 정보 형식
- */
-export interface ProjectMemberResponse {
-  /** 프로젝트의 멤버 UUID형태의 ID */
-  id: number;
-  /** 프로젝트의 멤버 정보 */
-  user?: UserSimpleResponse;
-  /** 프로젝트의 멤버 역할 */
-  role: MemberRole;
-  /** 프로젝트의 멤버 역할 이름 */
-  roleName: string;
-}
-
-/**
- * 프로젝트의 할일 세부 정보 형식
- */
-export interface ProjectTodoDetailedResponse {
-  /** 프로젝트 UUID형태의 ID */
-  id: string;
-  /** 할일의 생성 날짜 */
-  createdAt: string;
-  /** 할일의 수정 날짜 */
-  updatedAt?: string;
-  /** 할일의 타입(작업,이슈) */
-  type: TodoType;
-  /** 할일의 타입 이름 */
-  typeName: string;
-  /** 할일의 작업 상태(대기, 진행중, 완료, 보류) */
-  status: WorkStatus;
-  /** 할일의 작업 상태 이름 */
-  statusName: string;
-  /** 할일의 우선순위(낮음, 보통, 높음, 긴급) */
-  priority: TodoPriority;
-  /** 할일의 우선순위 이름 */
-  priorityName: string;
-  /** 할일의 제목 */
-  title: string;
-  /** 할일의 내용 */
-  content?: string;
-  /** 할일의 시작 날짜 */
-  startDate?: string;
-  /** 할일의 진행 기간*/
-  dueDate?: string;
-  /** 할일의 종료 날짜 */
-  endDate?: string;
-  /** 할일의 생성자 */
-  creator?: UserSimpleResponse;
-  /** 할일의 작업 응답 */
-  works: TodoWorkResponse[];
-  /** 최상단의 할일 확인 */
-  isRoot: boolean;
-  /** 할일이 있는 프로젝트 */
-  project: ProjectResponse;
-  /** 상위 할일이 존재하는지 여부 */
-  parent?: ProjectTodoResponse;
-  /** 하위 할일 정보 */
-  children: ProjectTodoDetailedResponse[];
-}
-
-/**
- * 할일 응답 정보 형식
- */
-export interface ProjectTodoResponse {
-  /** 할일 UUID형태의 ID */
-  id: string;
-  /** 할일의 생성 날짜 */
-  createdAt: string;
-  /** 할일의 수정 날짜 */
-  updatedAt?: string;
-  /** 할일의 타입(작업,이슈) */
-  type: TodoType;
-  /** 할일의 타입 이름 */
-  typeName: string;
-  /** 할일의 작업 상태(대기, 진행중, 완료, 보류) */
-  status: WorkStatus;
-  /** 할일의 작업 상태 이름 */
-  statusName: string;
-  /** 할일의 우선순위(낮음, 보통, 높음, 긴급) */
-  priority: TodoPriority;
-  /** 할일의 우선순위 이름 */
-  priorityName: string;
-  /** 할일의 제목 */
-  title: string;
-  /** 할일의 내용 */
-  content?: string;
-  /** 할일의 시작 날짜 */
-  startDate?: string;
-  /** 할일의 진행 기간*/
-  dueDate?: string;
-  /** 할일의 종료 날짜 */
-  endDate?: string;
-  /** 할일의 생성자 */
-  creator?: UserSimpleResponse;
-}
-
-/**
- * 프로젝트의 멤버 삭제 요청 형식
- */
-export interface ProjectMemberDelete {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 프로젝트의 삭제할 멤버 ID */
-  memberId: number;
-}
-
-/**
- * 프로젝트 생성에 필요한 정보 형식
- */
-export interface ProjectSave {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 프로젝트의 이름 */
-  name: string;
-  /** 프로젝트의 설명 */
-  description?: string;
-  /** 프로젝트의 공개 여부 */
-  isPublic: boolean;
-  /** 프로젝트의 시작 날짜 */
-  startDate: string;
-  /** 프로젝트이 종료 날짜 */
-  endDate?: string;
-  /** 프로젝트에 있는 유저 */
-  members: ProjectMemberSave[];
-}
-/**
- * 프로젝트 수정에 필요한 정보 형식
- */
-export interface ProjectUpdate {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 프로젝트의 이름 */
-  name: string;
-  /** 프로젝트의 설명 */
-  description?: string;
-  /** 프로젝트의 공개 여부 */
-  isPublic: boolean;
-  /** 프로젝트의 시작 날짜 */
-  startDate: string;
-  /** 프로젝트이 종료 날짜 */
-  endDate?: string;
-}
-
-/**
- * 프로젝트에 있는 유저 정보 형식
- */
-export interface ProjectMemberSave {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 유저의 정보 */
-  user: UserSimpleResponse;
-  /** 유저의 역할 */
-  role: MemberRole;
-}
-
-/**
- * 프로젝트의 할일 생성에 필요한 정보 형식
- */
-export interface ProjectTodoSave {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 할일의 타입(작업,이슈) */
-  type: TodoType;
-  /** 할일의 우선순위(낮음, 보통 , 높음, 긴급) */
-  priority: TodoPriority;
-  /** 할일 제목 */
-  title: string;
-  /** 할일의 내용 */
-  content?: string;
-  /** 할일의 진행 기간*/
-  dueDate?: string;
-  /** 할일 시작 날짜 */
-  startDate?: string;
-  /** 할일의 종료 날짜 */
-  endDate?: string;
-  /** 할일의 유저 */
-  members?: UserSimpleResponse[];
-  /**상위 할 일의 UUID형태의 ID */
-  parent?: string;
-  /** 하위 할일 정보 */
-  children?: ProjectTodoSave[];
-}
-
-/**
- * 프로젝트의 작업 조회에 응답 정보 형식
- */
-export interface TodoWorkResponse {
-  /** 프로젝트 UUID형태의 ID */
-  id: string;
-  /** 작업의 생성 날짜 */
-  createdAt: string;
-  /** 작업의 수정 날짜 */
-  updatedAt?: string;
-  /** 작업을 하는 유저 */
-  user: UserSimpleResponse;
-  /** 작업의 제목 */
-  title: string;
-  /** 작업의 내용 */
-  content?: string;
-  /** 작업의 진행률 */
-  percentage: number;
-  /** 작업의 순서 */
-  orders: number;
-  /** 작업 상태(대기, 진행중, 완료, 보류) */
-  status: WorkStatus;
-  /** 작업 상태 이름 */
-  statusName: string;
-  isSub?: boolean;
-}
-
-/**
- * 프로젝트 목록 조회시 줄 수 있는 옵션
- */
-export interface ProjectSearchRequest {
-  /** 프로젝트 이름 */
-  name?: string;
-  /** 프로젝트 공개여부 */
-  isPublic?: boolean;
-  /** 프로젝트 완료 여부 */
-  completed?: boolean;
-  /** 프로젝트 시작 날짜 */
-  startDate?: string;
-  /** 프로젝트 종료 날짜 */
-  endDate?: string;
-}
-
-/**
- * 프로젝트의 할일 목록 조회시 줄 수 있는 옵션
- */
-export interface TodoSearchRequest {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
-  /** 할일의 상태(대기, 진행중, 완료, 보류) */
-  status?: WorkStatus;
-  /** 할일의 타입(작업,이슈) */
-  type?: TodoType;
-  /** 할일의 우선순위(낮음, 보통, 높음, 긴급) */
-  priority?: TodoPriority;
-  /** 할일의 제목 */
-  title?: string;
-  /** 할일의 내용 */
-  content?: string;
-  /** 할일의 시작 날짜 */
-  startDate?: string;
-  /** 할일의 종료 날짜*/
-  endDate?: string;
-  /** 할일의 생성자 */
-  creator?: number;
-  /** 할일의 작업자 */
-  members?: number[];
-}
-
-/**
- * 유저의 정보
- */
-export interface UserSimpleResponse {
-  /** 유저의 ID */
-  id: number;
-  /** 유저의 이메일 */
-  email: string | null;
-  /** 유저의 이름 */
-  name: string | null;
-}
-
-/**
- * 관리자 : ADMIN
- * 맴버 : MEMBER
- */
-export type MemberRole = "ADMIN" | "MEMBER";
-export const MemberRoleInfo: Record<MemberRole, { displayName: string }> = {
-  ADMIN: { displayName: "관리자" },
-  MEMBER: { displayName: "맴버" },
-};
-
-/**
- * TASK : 할일
- * ISSUE : 이슈
- */
-export type TodoType = "TASK" | "ISSUE";
-export const TodoTypeInfo: Record<TodoType, { displayName: string }> = {
-  TASK: { displayName: "할일" },
-  ISSUE: { displayName: "이슈" },
-};
-
-/**
- * LOW : 낮음
- * MEDIUM : 보통
- * HIGH : 높음
- * CRITICAL : 긴급
- */
-export type TodoPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-export const TodoPriorityInfo: Record<TodoPriority, { displayName: string }> = {
-  LOW: { displayName: "낮음" },
-  MEDIUM: { displayName: "보통" },
-  HIGH: { displayName: "높음" },
-  CRITICAL: { displayName: "긴급" },
-};
-
-/**
- * waiting : 해야 할 일
- * in_progress : 진행중
- * completed : 완료
- * cancelled : 보류
- */
-export type WorkStatus = "WAITING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-export const WorkStatusInfo: Record<
+import {
+  MemberRole,
+  TodoPriority,
+  TodoType,
+  UserSimpleResponse,
   WorkStatus,
-  { displayName: string; color: string }
-> = {
-  WAITING: { displayName: "대기", color: "#E2E8F0" },
-  IN_PROGRESS: { displayName: "진행중", color: "#3B82F6" },
-  COMPLETED: { displayName: "완료", color: "#22C55E" },
-  CANCELLED: { displayName: "보류", color: "#94A3B8" },
-};
+} from "../../utils/type";
 
 /**
- * 프로젝트를 조작할 때 필요한 프로젝트 id
+ * 프로젝트 요청 정보
  */
-export interface ProjectId {
-  /** 프로젝트의 UUID형태의 ID */
-  id: string;
+export type ProjectRequest =
+  | ProjectRequest.ProjectSearchRequest
+  | ProjectRequest.ProjectMemberDelete
+  | ProjectRequest.ProjectMemberSave
+  | ProjectRequest.ProjectSave
+  | ProjectRequest.ProjectUpdate
+  | ProjectRequest.ProjectId;
+export declare namespace ProjectRequest {
+  /**
+   * 프로젝트 목록 조회시 줄 수 있는 옵션
+   */
+  export interface ProjectSearchRequest {
+    /**
+     * 프로젝트 이름
+     */
+    name?: string | null;
+    /**
+     * 프로젝트 공개여부
+     */
+    isPublic?: boolean | null;
+    /**
+     * 프로젝트 완료 여부
+     */
+    completed?: boolean | null;
+    /**
+     * date
+     * 프로젝트 시작 날짜
+     */
+    startDate?: string | null;
+    /**
+     * date
+     * 프로젝트 종료 날짜
+     */
+    endDate?: string | null;
+  }
+
+  /**
+   * 프로젝트의 멤버 삭제 요청 형식
+   */
+  export interface ProjectMemberDelete {
+    /**
+     * 프로젝트의 삭제할 멤버 ID
+     */
+    memberId: number;
+  }
+
+  /**
+   * 프로젝트에 있는 유저 정보 형식
+   */
+  export interface ProjectMemberSave {
+    /**
+     * 유저의  ID
+     */
+    id: number;
+  }
+
+  /**
+   * 프로젝트 생성에 필요한 정보 형식
+   */
+  export interface ProjectSave {
+    /**
+     *  프로젝트의 이름
+     */
+    name: string;
+    /**
+     * 프로젝트의 설명
+     */
+    description?: string | null;
+    /**
+     * 프로젝트의 공개 여부
+     */
+    isPublic: boolean;
+    /**
+     * date
+     * 프로젝트의 시작 날짜
+     */
+    startDate: string;
+    /**
+     * date
+     * 프로젝트이 종료 날짜
+     */
+    endDate: string;
+    /**
+     * 프로젝트에 추가할 유저 정보
+     */
+    members: ProjectMemberSave[];
+  }
+
+  /**
+   * 프로젝트 수정에 필요한 정보 형식
+   */
+  export interface ProjectUpdate {
+    /**
+     * 프로젝트의 이름
+     */
+    name?: string | null;
+    /**
+     * 프로젝트의 설명
+     */
+    description?: string | null;
+    /**
+     * 프로젝트의 공개 여부
+     */
+    isPublic?: boolean | null;
+    /**
+     * date
+     * 프로젝트의 시작 날짜
+     */
+    startDate?: string | null;
+    /**
+     * date
+     * 프로젝트이 종료 날짜
+     */
+    endDate?: string | null;
+  }
+
+  /**
+   * 프로젝트를 조작할 때 필요한 프로젝트 id
+   */
+  export interface ProjectId {
+    /**
+     * UUID
+     * 프로젝트의  ID
+     */
+    id: string;
+  }
+}
+
+export type ProjectResponse =
+  | ProjectResponse.ProjectResponse
+  | ProjectResponse.ProjectMemberResponse
+  | ProjectResponse.ProjectTodoDetailedResponse
+  | ProjectResponse.ProjectTodoResponse
+  | ProjectResponse.TodoWorkResponse;
+export declare namespace ProjectResponse {
+  export interface ProjectResponse {
+    id: string;
+    createdAt: string;
+    updatedAt?: string;
+    name: string;
+    description?: string;
+    isPublic: boolean;
+    completed: boolean;
+    startDate: string;
+    endDate?: string;
+    creator?: UserSimpleResponse;
+  }
+
+  export interface ProjectMemberResponse {
+    id: number;
+    user?: UserSimpleResponse;
+    role: MemberRole;
+    roleName: string;
+  }
+
+  export interface ProjectTodoDetailedResponse {
+    id: string;
+    createdAt: string;
+    updatedAt?: string;
+    type: TodoType;
+    typeName: string;
+    status: WorkStatus;
+    statusName: string;
+    priority: TodoPriority;
+    priorityName: string;
+    title: string;
+    content?: string;
+    startDate?: string;
+    dueDate?: string;
+    endDate?: string;
+    creator?: UserSimpleResponse;
+    works: TodoWorkResponse[];
+    isRoot: boolean;
+    project: ProjectResponse;
+    parent?: ProjectTodoResponse;
+    children: ProjectTodoDetailedResponse[];
+  }
+
+  export interface ProjectTodoResponse {
+    id: string;
+    createdAt: string;
+    updatedAt?: string;
+    type: TodoType;
+    typeName: string;
+    status: WorkStatus;
+    statusName: string;
+    priority: TodoPriority;
+    priorityName: string;
+    title: string;
+    content?: string;
+    startDate?: string;
+    dueDate?: string;
+    endDate?: string;
+    creator?: UserSimpleResponse;
+  }
+
+  export interface TodoWorkResponse {
+    id: string;
+    createdAt: string;
+    updatedAt?: string;
+    user: UserSimpleResponse;
+    title: string;
+    content?: string;
+    percentage: number;
+    orders: number;
+    status: WorkStatus;
+    statusName: string;
+    isSub?: boolean;
+  }
 }

@@ -1,21 +1,22 @@
-import { ProjectId, TodoWorkResponse, TodoWorkUpdateRequest } from "./Types";
+import { WithWorkId } from "../../utils/type";
+import { ProjectRequest } from "../Project/Types";
+import { WorkRequest, WorkResponse } from "./Types";
 
 export class WorkService {
-  private accessToken: string;
-  private server_url: string;
-
-  constructor(accessToken: string, server_url: string) {
-    this.server_url = server_url;
-    this.accessToken = accessToken;
-  }
+  constructor(
+    private accessToken: string,
+    private server_url: string,
+  ) {}
 
   /**
-   * 해당 프로젝트에 내에 작업을 조회합니다.
+   * 해당 프로젝트에 내에 나의 작업을 조회합니다.
    * @param id 조회할 프로젝트 ID
    * @returns 나의 작업
    */
-  public async getMyWorksInProject(id: ProjectId): Promise<TodoWorkResponse[]> {
-    const projectid = encodeURIComponent(id.id);
+  public async getMyWorksInProject(
+    props: ProjectRequest.ProjectId,
+  ): Promise<WorkResponse.TodoWorkResponse[]> {
+    const projectid = encodeURIComponent(props.id);
     const response = await fetch(
       `${this.server_url}/api/v1/projects/${projectid}/works`,
       {
@@ -36,23 +37,19 @@ export class WorkService {
    * @param props.id 수정할 작업 ID
    * @returns 작업 수정 결과
    */
-  public async updateWork(props: TodoWorkUpdateRequest): Promise<boolean> {
-    const todoData = {
-      id: props.id,
-      title: props.title,
-      content: props.content,
-      percentage: props.percentage,
-      status: props.status,
-    };
+  public async updateWork(
+    props: WithWorkId<WorkRequest.TodoWorkUpdateRequest>,
+  ): Promise<boolean> {
+    const { workId, ...rest } = props;
     const response = await fetch(
-      `${this.server_url}/api/v1/todo-works/${todoData.id}`,
+      `${this.server_url}/api/v1/todo-works/${workId}`,
       {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(todoData),
+        body: JSON.stringify(rest),
       },
     );
     return response.ok;

@@ -1,10 +1,4 @@
-import {
-  EventCreateRequest,
-  EventId,
-  EventResponse,
-  EventSearchRequest,
-  EventUpdateRequest,
-} from "./Types";
+import { EventRequest, EventResponse } from "./Types";
 
 export class EventService {
   private accessToken: string;
@@ -22,7 +16,7 @@ export class EventService {
    * @returns 이벤트의 목록
    */
   public async listEvents(
-    search: EventSearchRequest,
+    search: EventRequest.EventSearchRequest,
   ): Promise<EventResponse[]> {
     const params = new URLSearchParams({ yearMonth: search.yearMonth });
     const response = await fetch(
@@ -43,7 +37,7 @@ export class EventService {
    * @param id 조회할 이벤트의 ID
    * @returns 특정 id의 이벤트
    */
-  public async retrieveEvent(id: EventId): Promise<EventResponse> {
+  public async retrieveEvent(id: EventRequest.EventId): Promise<EventResponse> {
     const eventid = encodeURIComponent(id.id);
     const response = await fetch(
       `${this.server_url}/api/v1/events/${eventid}`,
@@ -64,7 +58,9 @@ export class EventService {
    * @param props 추가할 이벤트의 데이터
    * @returns 추가된 이벤트
    */
-  public async createEvent(props: EventCreateRequest): Promise<EventResponse> {
+  public async createEvent(
+    props: EventRequest.EventCreateRequest,
+  ): Promise<EventResponse> {
     const eventData = {
       title: props.title, //필수
       startDate: props.startDate, //필수
@@ -89,7 +85,9 @@ export class EventService {
    * @param props.id 수정할 이벤트 ID
    * @returns 수정된 이벤트
    */
-  public async updateEvent(props: EventUpdateRequest): Promise<EventResponse> {
+  public async updateEvent(
+    props: EventRequest.EventUpdateRequest,
+  ): Promise<EventResponse> {
     const eventData = {
       id: props.id, //event id(필수)
       title: props.title,
@@ -113,23 +111,23 @@ export class EventService {
     return response.json();
   }
 
-  // /**
-  //  * 특정 이벤트를 삭제합니다.
-  //  * @param id 삭제할 이벤트의 ID
-  //  * @returns 삭제된 이벤트
-  //  */
-  // public async deleteEvent(id: EventId): Promise<EventResponse> {
-  //   const eventid = encodeURIComponent(id.id);
-  //   const response = await fetch(
-  //     `${this.server_url}/api/v1/events/${eventid}`,
-  //     {
-  //       method: "DELETE",
-  //       headers: {
-  //         Authorization: `Bearer ${this.accessToken}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     },
-  //   );
-  //   return response.json();
-  // }
+  /**
+   * 특정 이벤트를 삭제합니다.
+   * @param id 삭제할 이벤트의 ID
+   * @returns 삭제된 이벤트
+   */
+  public async deleteEvent(id: EventRequest.EventId): Promise<EventResponse> {
+    const eventid = encodeURIComponent(id.id);
+    const response = await fetch(
+      `${this.server_url}/api/v1/events/${eventid}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    return response.json();
+  }
 }

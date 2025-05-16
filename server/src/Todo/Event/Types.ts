@@ -1,109 +1,143 @@
-/**
- * 이벤트를 조회할 때 필요한 정보
- */
-export interface EventSearchRequest {
-  /** 조회할 이벤트의 연도와 월, YYYY-MM 형식 */
-  yearMonth: string;
+import { UserSimpleResponse } from "../../utils/type";
+
+export type EventRequest =
+  | EventRequest.EventSearchRequest
+  | EventRequest.EventCreateRequest
+  | EventRequest.EventUpdateRequest
+  | EventRequest.EventId;
+export declare namespace EventRequest {
+  export interface Mapper {
+    search: EventSearchRequest;
+    create: EventCreateRequest;
+    update: EventUpdateRequest;
+    id: EventId;
+  }
+
+  /**
+   * 이벤트를 조회할 때 필요한 정보
+   */
+  export type EventSearchRequest = {
+    /**
+     * YYYY-MM
+     * 연도와 월
+     */
+    yearMonth: string;
+  };
+
+  /**
+   * 이벤트의 참여하고 있는 유저 정보
+   */
+  export type EventParticipantCreateRequest = {
+    /**
+     * 참여한 유저의 ID
+     */
+    userId: number;
+  };
+
+  /**
+   * 이벤트를 생성할 때 필요한 정보
+   */
+  export type EventCreateRequest = {
+    /**
+     * 이벤트의 제목
+     */
+    title: string;
+    /**
+     * date-time
+     * 이벤트의 시작 날짜
+     */
+    startDate: string;
+    /**
+     * date-time
+     * 이벤트의 종료 날짜
+     */
+    endDate: string;
+    /**
+     * 이벤트의 설명
+     */
+    description?: string | null;
+    /**
+     * 이벤트의 참여자 목록
+     */
+    participants: EventParticipantCreateRequest[];
+  };
+
+  /**
+   * 이벤트의 참여자 삭제 요청 정보
+   */
+  export type EventParticipantDeleteRequest = {
+    /**
+     * UUID
+     * 참여자의 ID
+     */
+    id: string;
+  };
+
+  /**
+   * 이벤트를 수정할 때 필요한 정보
+   */
+  export type EventUpdateRequest = {
+    /**
+     * UUID
+     * 수정할 이벤트의 ID
+     */
+    id: string;
+    /**
+     * 수정할 이벤트의 제목
+     */
+    title?: string;
+    /**
+     * date-time
+     * 수정할 이벤트의 시작 날짜
+     */
+    start?: string;
+    /**
+     * date-time
+     * 수정할 이벤트의 종료 날짜
+     */
+    end?: string;
+    /**
+     * 수정할 이벤트의 설명
+     */
+    description?: string | null;
+    /**
+     * 추가할 참여자 목록
+     */
+    added?: EventParticipantCreateRequest[];
+    /**
+     * 제거할 참여자 목록
+     */
+    removed?: EventParticipantDeleteRequest[];
+  };
+
+  /**
+   * 이벤트의 ID
+   */
+  export type EventId = {
+    /**
+     * UUID
+     * 이벤트의 ID
+     */
+    id: string;
+  };
 }
 
-/**
- * 이벤트를 생성할 때 필요한 정보
- */
-export interface EventCreateRequest {
-  /** 생성할 이벤트의 제목 */
-  title: string;
-  /** 생성할 이벤트의 시작 날짜 */
-  startDate: string;
-  /** 생성할 이벤트의 종료 날짜 */
-  endDate: string;
-  /** 생성할 이벤트의 설명 */
-  description?: string;
-  /** 생성할 이벤트의 참여자 목록 */
-  participants: EventParticipantCreateRequest[];
-}
+export type EventResponse =
+  | EventResponse.EventResponse
+  | EventResponse.EventParticipantResponse;
+export declare namespace EventResponse {
+  export interface EventResponse {
+    id: string;
+    title: string;
+    start: string;
+    end: string;
+    description?: string;
+    creator: UserSimpleResponse;
+    participants: EventParticipantResponse[];
+  }
 
-/**
- * 이벤트의 참여하고 있는 유저 정보
- */
-export interface EventParticipantCreateRequest {
-  /** 참여한 유저의 ID */
-  userId: number;
-}
-
-/**
- * 이벤트의 참여자 삭제 요청 정보
- */
-export interface EventParticipantDeleteRequest {
-  /** 삭제할 참여자의 UUID형태의 ID */
-  id: string;
-}
-
-/**
- * 이벤트를 수정할 때 필요한 정보
- */
-export interface EventUpdateRequest {
-  /** 수정할 이벤트의 UUID형태의 ID */
-  id: string;
-  /** 이벤트의 수정할 제목 */
-  title?: string;
-  /** 이벤트의 수정할 시작 날짜 */
-  start?: string;
-  /** 이벤트의 수정할 종료 날짜 */
-  end?: string;
-  /** 이벤트의 수정할 설명 */
-  description?: string;
-  /** 수정할 이벤트의 추가할 참여자 목록 */
-  added?: EventParticipantCreateRequest[];
-  /** 수정할 이벤트의 삭제할 참여자 목록 */
-  removed?: EventParticipantDeleteRequest[];
-}
-
-/**
- * 이벤트의 상세 조회 응답 정보
- */
-export interface EventResponse {
-  /** 이벤트의 UUID형태의 ID */
-  id: string;
-  /** 이벤트의 제목 */
-  title: string;
-  /** 이벤트의 시작 날짜 */
-  start: string;
-  /** 이벤트의 종료 날짜 */
-  end: string;
-  /** 이벤트의 설명 */
-  description?: string;
-  /** 이벤트를 만든 사람 */
-  creator: UserSimpleResponse;
-  /** 이벤트의 참여자 */
-  participants: EventParticipantResponse[];
-}
-
-/**
- * 이벤트 참여자 응답 정보
- */
-export interface EventParticipantResponse {
-  /** 참여자의 UUID형태의 ID */
-  id: string;
-  /** 유저의 정보 */
-  user: UserSimpleResponse;
-}
-
-/**
- * 유저의 정보
- */
-export interface UserSimpleResponse {
-  /** 유저의 ID */
-  id: number;
-  /** 유저의 이메일 */
-  email?: string;
-  /** 유저의 이름 */
-  name?: string;
-}
-
-/**
- * 이벤트를 조작할 때 필요한 이벤트 id 정보
- */
-export interface EventId {
-  /** 이벤트의 UUID형태의 ID */
-  id: string;
+  export interface EventParticipantResponse {
+    id: string;
+    user: UserSimpleResponse;
+  }
 }

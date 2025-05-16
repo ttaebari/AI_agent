@@ -13,6 +13,8 @@ import { EventService } from "./Todo/Event/EventService";
 import { ProjectTodoService } from "./Todo/Project-Todo/ProjectTodoService";
 import { ProjectService } from "./Todo/Project/ProjectService";
 import { WorkService } from "./Todo/Work/WorkService";
+import { COMMON_PROMPT } from "./prompts/common";
+import { TODO_PROMPT } from "./prompts/todo";
 import { TodoService } from "./todo_service";
 import { WeatherService } from "./weather_service";
 
@@ -49,12 +51,21 @@ const main = async (): Promise<void> => {
     // const url: URL = new URL(`http://localhost${acceptor.path}`);
     const agent: Agentica<"chatgpt"> = new Agentica({
       model: "chatgpt",
+      config: {
+        locale: "ko",
+        executor: {},
+        systemPrompt: {
+          common(_) {
+            return `
+              ${COMMON_PROMPT}
+              ${TODO_PROMPT}
+            `;
+          },
+        },
+      },
       vendor: {
         api: new OpenAI({ apiKey: SGlobal.env.OPENAI_API_KEY }),
         model: "gpt-4o-mini",
-      },
-      config: {
-        locale: "ko",
       },
       controllers: [
         // {
@@ -105,9 +116,6 @@ const main = async (): Promise<void> => {
       ],
       histories: await getPromptHistories(users, roomid),
     });
-    // agent.conversate(
-    //   "우리 할일 목록 프로젝트에는 전체 큰 프로젝트가 있고, 프로젝트에는 여러 개의 할일이 있습니다. 이 할일은 여러 개의 하위 할일을 가질 수 있습니다. 이 프로젝트는 여러 개의 유저가 참여할 수 있습니다. 할일 또한 여러 개의 유저가 참여 가능하고 내가 참여한 할일이 내 작업이 됩니다. 할일 관련 조작은 todo관련 함수를 사용하고, 작업 관련 조작은 work관련 함수를 사용합니다. 프로젝트와 할일은 여러 옵션(참여한 유저, 이름)등을 넣어서 조회가능하고, 작업은 내 작업만 조회가능합니다. 이 프로젝트에 대한 정보는 다음과 같습니다.",
-    // );
     const service: AgenticaRpcService<"chatgpt"> = new AgenticaRpcService({
       agent,
       listener: driver,
