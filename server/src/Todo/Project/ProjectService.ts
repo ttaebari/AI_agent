@@ -68,6 +68,12 @@ export class ProjectService {
       body: JSON.stringify({
         ...props,
         isPublic: props.isPublic || true,
+        members: props.members.map((member) => ({
+          user: {
+            id: member.id,
+          },
+          role: "MEMBER",
+        })),
       }),
     });
     return response.json();
@@ -253,7 +259,6 @@ export class ProjectService {
 
   /**
    * 특정 프로젝트의 할일을 생성해 추가합니다.
-   * type, priority, title은 필수입니다.
    * @param props 추가할 할일의 데이터
    * @param props.id 추가할 프로젝트의 ID
    * @returns 생성후 추가 성공 여부

@@ -13,6 +13,7 @@ import { EventService } from "./Todo/Event/EventService";
 import { ProjectTodoService } from "./Todo/Project-Todo/ProjectTodoService";
 import { ProjectService } from "./Todo/Project/ProjectService";
 import { WorkService } from "./Todo/Work/WorkService";
+import { UserService } from "./Todo/user/UserService";
 import { COMMON_PROMPT } from "./prompts/common";
 import { TODO_PROMPT } from "./prompts/todo";
 import { TodoService } from "./todo_service";
@@ -112,6 +113,12 @@ const main = async (): Promise<void> => {
           name: "작업 수정 관련 클래스",
           application: typia.llm.application<WorkService, "chatgpt">(),
           execute: new WorkService(accessToken, SERVER_URLS.TODO_MANAGMENT_APP),
+        },
+        {
+          protocol: "class",
+          name: "유저 조회 관련 클래스",
+          application: typia.llm.application<UserService, "chatgpt">(),
+          execute: new UserService(accessToken, SERVER_URLS.TODO_MANAGMENT_APP),
         },
       ],
       histories: await getPromptHistories(users, roomid),

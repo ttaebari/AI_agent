@@ -45,11 +45,13 @@ export declare namespace EventRequest {
     /**
      * date-time
      * 이벤트의 시작 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     startDate: string;
     /**
      * date-time
      * 이벤트의 종료 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     endDate: string;
     /**
@@ -89,11 +91,13 @@ export declare namespace EventRequest {
     /**
      * date-time
      * 수정할 이벤트의 시작 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     start?: string;
     /**
      * date-time
      * 수정할 이벤트의 종료 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     end?: string;
     /**

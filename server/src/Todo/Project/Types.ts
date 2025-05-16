@@ -36,11 +36,13 @@ export declare namespace ProjectRequest {
     /**
      * date
      * 프로젝트 시작 날짜
+     * YYYY-MM-DD 형식으로 작성
      */
     startDate?: string | null;
     /**
      * date
      * 프로젝트 종료 날짜
+     * YYYY-MM-DD 형식으로 작성
      */
     endDate?: string | null;
   }
@@ -84,11 +86,13 @@ export declare namespace ProjectRequest {
     /**
      * date
      * 프로젝트의 시작 날짜
+     * YYYY-MM-DD 형식으로 작성
      */
     startDate: string;
     /**
      * date
      * 프로젝트이 종료 날짜
+     * YYYY-MM-DD 형식으로 작성
      */
     endDate: string;
     /**
@@ -116,11 +120,13 @@ export declare namespace ProjectRequest {
     /**
      * date
      * 프로젝트의 시작 날짜
+     * YYYY-MM-DD 형식으로 작성
      */
     startDate?: string | null;
     /**
      * date
      * 프로젝트이 종료 날짜
+     * YYYY-MM-DD 형식으로 작성
      */
     endDate?: string | null;
   }

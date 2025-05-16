@@ -46,11 +46,13 @@ export declare namespace ProjectTodoRequest {
     /**
      * date-time
      * 할일의 시작 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     startDate?: string | null;
     /**
      * date-time
      * 할일의 종료 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     endDate?: string | null;
     /**
@@ -86,11 +88,13 @@ export declare namespace ProjectTodoRequest {
     /**
      * date-time
      * 할일의 진행 기간
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     dueDate: string; // endDate 까지 이걸로
     /**
      * date-time
      * 할일 시작 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     startDate: string;
     /**
@@ -130,10 +134,12 @@ export declare namespace ProjectTodoRequest {
     content?: string | null;
     /**
      * 할일의 시작 날짜
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     startDate?: string | null;
     /**
      * 할일의 진행 기간
+     * YYYY-MM-DDThh:mm:ss 형식으로 작성
      */
     dueDate?: string | null;
   }
