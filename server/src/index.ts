@@ -9,6 +9,10 @@ import { WebSocketServer } from "tgrid";
 import typia, { Primitive } from "typia";
 
 import { SGlobal } from "./SGlobal";
+import { EventService } from "./Todo/Event/EventService";
+import { ProjectTodoService } from "./Todo/Project-Todo/ProjectTodoService";
+import { ProjectService } from "./Todo/Project/ProjectService";
+import { WorkService } from "./Todo/Work/WorkService";
 import { TodoService } from "./todo_service";
 import { WeatherService } from "./weather_service";
 
@@ -19,7 +23,12 @@ const getPromptHistories = async (
   // GET PROMPT HISTORIES FROM DATABASE
   userid;
   roomNumber;
+  console.log(roomNumber);
   return [];
+};
+
+const SERVER_URLS = {
+  TODO_MANAGMENT_APP: `https://todo-api.neulgo.com`,
 };
 
 const main = async (): Promise<void> => {
@@ -27,15 +36,16 @@ const main = async (): Promise<void> => {
     console.error("env.OPENAI_API_KEY is not defined.");
 
   const server: WebSocketServer<
-    { user: string; roomNumber: number },
+    { users: string; roomid: number },
     IAgenticaRpcService<"chatgpt">,
     IAgenticaRpcListener
   > = new WebSocketServer();
   await server.open(Number(SGlobal.env.PORT), async (acceptor) => {
     const header = acceptor.header;
-    const { user, roomNumber } = header;
+    const { users, roomid } = header;
     const driver = acceptor.getDriver();
-
+    console.log("user and roomNumber", users, roomid);
+    const accessToken = SGlobal.env.ACCESS_TOKEN;
     // const url: URL = new URL(`http://localhost${acceptor.path}`);
     const agent: Agentica<"chatgpt"> = new Agentica({
       model: "chatgpt",
@@ -47,21 +57,57 @@ const main = async (): Promise<void> => {
         locale: "ko",
       },
       controllers: [
+        // {
+        //   protocol: "class",
+        //   name: "To Do service",
+        //   application: typia.llm.application<TodoService, "chatgpt">(),
+        //   execute: new TodoService(),
+        // },
+        // {
+        //   protocol: "class",
+        //   name: "Weather service",
+        //   application: typia.llm.application<WeatherService, "chatgpt">(),
+        //   execute: new WeatherService(),
+        // },
         {
           protocol: "class",
-          name: "To Do service",
-          application: typia.llm.application<TodoService, "chatgpt">(),
-          execute: new TodoService(),
+          name: "이벤트 처리 관련 클래스",
+          application: typia.llm.application<EventService, "chatgpt">(),
+          execute: new EventService(
+            accessToken,
+            SERVER_URLS.TODO_MANAGMENT_APP,
+          ),
         },
         {
           protocol: "class",
-          name: "Weather service",
-          application: typia.llm.application<WeatherService, "chatgpt">(),
-          execute: new WeatherService(),
+          name: "프로젝트 처리 관련 & 프로젝트 할일 추가 조회 클래스",
+          application: typia.llm.application<ProjectService, "chatgpt">(),
+          execute: new ProjectService(
+            accessToken,
+            SERVER_URLS.TODO_MANAGMENT_APP,
+          ),
+        },
+        {
+          protocol: "class",
+          name: "할일과 하위할일 수정 삭제 관련 클래스",
+          application: typia.llm.application<ProjectTodoService, "chatgpt">(),
+          execute: new ProjectTodoService(
+            accessToken,
+            SERVER_URLS.TODO_MANAGMENT_APP,
+          ),
+        },
+        {
+          protocol: "class",
+          name: "작업 수정 관련 클래스",
+          application: typia.llm.application<WorkService, "chatgpt">(),
+          execute: new WorkService(accessToken, SERVER_URLS.TODO_MANAGMENT_APP),
         },
       ],
-      histories: await getPromptHistories(user, roomNumber),
+      histories: await getPromptHistories(users, roomid),
     });
+    // agent.conversate(
+    //   "우리 할일 목록 프로젝트에는 전체 큰 프로젝트가 있고, 프로젝트에는 여러 개의 할일이 있습니다. 이 할일은 여러 개의 하위 할일을 가질 수 있습니다. 이 프로젝트는 여러 개의 유저가 참여할 수 있습니다. 할일 또한 여러 개의 유저가 참여 가능하고 내가 참여한 할일이 내 작업이 됩니다. 할일 관련 조작은 todo관련 함수를 사용하고, 작업 관련 조작은 work관련 함수를 사용합니다. 프로젝트와 할일은 여러 옵션(참여한 유저, 이름)등을 넣어서 조회가능하고, 작업은 내 작업만 조회가능합니다. 이 프로젝트에 대한 정보는 다음과 같습니다.",
+    // );
     const service: AgenticaRpcService<"chatgpt"> = new AgenticaRpcService({
       agent,
       listener: driver,

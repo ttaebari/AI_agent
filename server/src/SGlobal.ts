@@ -12,6 +12,7 @@ export class SGlobal {
 interface IEnvironments {
   OPENAI_API_KEY?: string;
   PORT: `${number}`;
+  ACCESS_TOKEN: string;
 }
 
 const environments = new Singleton(() => {

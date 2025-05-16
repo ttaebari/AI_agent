@@ -32,24 +32,48 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
     };
 
     //룸 추가
-    const addRoom = () => {
+    const addRoom = async () => {
         const newId = rooms.length > 0 ? Math.max(...rooms.map((r) => r.id)) + 1 : 1;
+        await fetch(`${Server_URL}/room/${newId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                roomname: `Room ${newId}`,
+            }),
+        });
         setRooms((prev) => [...prev, { id: newId, name: `Room ${newId}` }]);
         onChangeRoomid(newId);
     };
 
     //룸 삭제
-    const removeRoom = (id: number) => {
+    const removeRoom = async (id: number) => {
         if (rooms.length === 1) return;
+        await fetch(`${Server_URL}/room/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
         const updated = rooms.filter((room) => room.id !== id);
         setRooms(updated);
         if (roomid === id) {
-            onChangeRoomid(updated[0].id);
+            onChangeRoomid(updated[updated.length - 1].id);
         }
     };
 
     //룸 이름 변경
-    const renameRoom = (id: number, name: string) => {
+    const renameRoom = async (id: number, name: string) => {
+        await fetch(`${Server_URL}/room/${id}`, {
+            method: "patch",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                roomname: name,
+            }),
+        });
         setRooms((prev) => prev.map((room) => (room.id === id ? { ...room, name } : room)));
     };
 
@@ -71,6 +95,7 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
     useEffect(() => {
         async function fetchMessages() {
             try {
+                console.log("check fetch", roomid);
                 const res = await fetch(`${Server_URL}/message/${roomid}`, {
                     method: "GET",
                     headers: {
@@ -78,6 +103,7 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
                     },
                 });
                 const messages = await res.json();
+                console.log("check fetch message ", messages);
                 if (!res.ok) throw new Error("Failed to fetch messages");
                 setMessageHistory(messages);
             } catch (error) {
@@ -131,7 +157,9 @@ export function Chat({ roomid, onChangeRoomid }: { roomid: number; onChangeRoomi
                                 )}
                             </button>
                             <button
-                                onClick={() => removeRoom(room.id)}
+                                onClick={() => {
+                                    removeRoom(room.id);
+                                }}
                                 className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-700"
                             >
                                 ✕

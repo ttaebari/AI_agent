@@ -8,7 +8,7 @@ const AgenticaRpcContext = createContext<AgenticaRpcContextType | null>(null);
 
 export function AgenticaRpcProvider({
     children,
-    users = "taeho",
+    users = "eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRhZWhvdHVuYUBicm9hbmV4LmNvbSIsIm5hbWUiOiLstZztg5ztmLgiLCJpYXQiOjE3NDcwOTM4OTQsImV4cCI6MTc0NzEyOTg5NH0.QYxp9aFsoAAW8vyQQo1w3yg78PKrXu1er3beeYLGl7A2zojsPQefJ0YaJ-tvLmfM",
     roomid = 1,
 }: PropsWithChildren<{ users?: string; roomid?: number }>) {
     const [messages, setMessages] = useState<IAgenticaEventJson[]>([]);

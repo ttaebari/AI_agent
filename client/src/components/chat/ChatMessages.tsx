@@ -41,7 +41,7 @@ export function ChatMessages({ messages, messageHistory, roomid }: ChatMessagesP
                 console.error("Error sending message to server:", error);
             }
         };
-        if (messages) {
+        if (messages && messages.length > 0) {
             sendMessage();
         }
     }, [messages]);

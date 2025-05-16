@@ -66,6 +66,7 @@ app.post("/message", async (req: Request, res: Response): Promise<void> => {
 // *room별 message 조회
 app.get("/message/:roomid", async (req: Request, res: Response): Promise<void> => {
     const roomid = parseInt(req.params.roomid);
+    console.log("roomid", roomid);
     try {
         const messages = await prisma.messagelist.findMany({
             where: { roomid: roomid },
@@ -82,10 +83,65 @@ app.get("/message/:roomid", async (req: Request, res: Response): Promise<void> =
 // *room별 message 삭제
 app.delete("/message/:roomid", async (req: Request, res: Response): Promise<void> => {
     const roomid = parseInt(req.params.roomid);
+    console.log("delete roomid", roomid);
     try {
         await prisma.messagelist.deleteMany({ where: { roomid: roomid } });
     } catch (err) {
         res.status(500).json({ error: "Failed to delete messages" });
+    }
+});
+
+// *room 생성
+app.post("/room/:roomid", async (req: Request, res: Response): Promise<void> => {
+    const roomid = parseInt(req.params.roomid);
+    const { roomname } = req.body;
+    if (!roomname) {
+        res.status(400).json({ error: "Invalid room data" });
+        return;
+    }
+    try {
+        await prisma.roomlist.create({
+            data: {
+                roomid,
+                roomname,
+            },
+        });
+    } catch (err) {
+        console.error("Prisma insert error:", err);
+        res.status(500).json({ error: "Failed to create room" });
+    }
+});
+
+// *room 이름 변경
+app.patch("/room/:roomid", async (req: Request, res: Response): Promise<void> => {
+    const roomid = parseInt(req.params.roomid);
+    const { roomname } = req.body;
+    if (!roomname) {
+        res.status(400).json({ error: "Invalid room data" });
+        return;
+    }
+    try {
+        const room = await prisma.roomlist.update({
+            where: { roomid: roomid },
+            data: { roomname },
+        });
+        res.status(200).json({ room });
+    } catch (err) {
+        console.error("Prisma update error:", err);
+        res.status(500).json({ error: "Failed to update room" });
+    }
+});
+
+// *room별 message 삭제
+app.delete("/room/:roomid", async (req: Request, res: Response): Promise<void> => {
+    const roomid = parseInt(req.params.roomid);
+    console.log("delete roomid", roomid);
+    try {
+        await prisma.roomlist.delete({ where: { roomid: roomid } });
+        res.status(200).json({ message: "Room and messages deleted successfully" });
+    } catch (err) {
+        console.error("Failed to delete room and messages:", err);
+        res.status(500).json({ error: "Failed to delete room and messages" });
     }
 });
 
