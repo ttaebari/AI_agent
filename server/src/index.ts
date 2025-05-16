@@ -69,18 +69,18 @@ const main = async (): Promise<void> => {
         model: "gpt-4o-mini",
       },
       controllers: [
-        // {
-        //   protocol: "class",
-        //   name: "To Do service",
-        //   application: typia.llm.application<TodoService, "chatgpt">(),
-        //   execute: new TodoService(),
-        // },
-        // {
-        //   protocol: "class",
-        //   name: "Weather service",
-        //   application: typia.llm.application<WeatherService, "chatgpt">(),
-        //   execute: new WeatherService(),
-        // },
+        {
+          protocol: "class",
+          name: "To Do service",
+          application: typia.llm.application<TodoService, "chatgpt">(),
+          execute: new TodoService(),
+        },
+        {
+          protocol: "class",
+          name: "Weather service",
+          application: typia.llm.application<WeatherService, "chatgpt">(),
+          execute: new WeatherService(),
+        },
         {
           protocol: "class",
           name: "이벤트 처리 관련 클래스",
